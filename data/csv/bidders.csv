@@ -1,9 +1,0 @@
-bidder,class,value_multiplier,why_credible
-SpaceX,D2D,1,"Bought EchoStar AWS-4, H-block, and unpaired AWS-3 (~$19.6B) and Grain 800 MHz (~$8B). Won B1 Cincinnati and one other license in Auction 113. Owns the adjacent 1695–1710 MHz."
-Amazon Leo,D2D,1,"Acquired Globalstar (FCC approved Oct 27, 2026); D2D service planned from 2028."
-AST SpaceMobile,D2D,1,D2D operator backed by AT&T and Verizon; L-band arrangement with Ligado. Doubt: capital (about $1.5B cash mid-2025; later raises reported but not verified here).
-Carrier D2D JV,D2D,1,"AT&T, Verizon, T-Mobile D2D spectrum-pooling JV (reported Oct 2026). Off by default."
-AT&T,Carrier,1,Largest Auction 97 winner; won 10 licenses in Auction 113.
-Verizon,Carrier,1,Won 82 licenses for $3.16B in Auction 113.
-T-Mobile,Carrier,1,Won 102 licenses in Auction 113.
-Ligado,Adjacent,1,Holds 1670–1675 MHz next to the lower block. Doubt: in Chapter 11 restructuring (plan approved Sept 2025; claims still being settled in July 2026). Valued at the carrier benchmark.

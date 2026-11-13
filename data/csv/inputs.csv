@@ -1,21 +1,23 @@
 input,value,source_or_note
 "U.S. population, 2020 Census",331449281,"U.S. Census Bureau, 2020 Census resident population (50 states and DC)."
-Block size (MHz),10,FNPRM proposal: two unpaired 10 MHz blocks (Covington summary).
-Number of blocks,2,FNPRM proposal.
+Block size (MHz),10,FNPRM para. 48: two unpaired 10 MHz blocks (1675-1685 and 1685-1695 MHz).
+Number of blocks,2,FNPRM para. 48. The 2020-2025 MHz block is out of scope.
 Reserve price per block ($),0,Not known. Used only when fewer unit bids than blocks plus one.
 Federal coordination availability,1,Deferred; 100% until zones are modeled.
-SpaceX value of a second block (share of first),1,Used only when SpaceX wants both blocks. Demand reduction then decides whether it bids for two.
-TDL: downlink share of paired AWS-3 value,0.5,Assumption with no evidence. Feeds the TDL high case only. TDL scenarios are suspended.
-NOAA transition cost paid from proceeds ($),0,Unknown. Enter when public.
+Lead D2D bidder's value of a second block (share of first),1,Used only when one D2D bidder wants both blocks. Demand reduction then decides whether it bids for two.
+Capitalization rate for the 1670-1675 MHz lease,0.07,"FNPRM App. C, para. 4 converts auction values to annual payments at 7% (OMB Circular A-4)."
+Adjacency premium for the lead D2D bidder (share of its value),0,A bidder next to the band may value it more (Ausubel et al. 1997). 0 by default; swept in analysis.py.
 "Auction 97 net bids, published ($)",41329673325,"FCC Public Notice DA 15-131 (Jan 30, 2015), para. 1."
 "Auction 97 licenses won, published",1611,FCC Public Notice DA 15-131.
-"Auction 97 gross bids, published (rounded, $)",44900000000,"Widely reported as $44.9 billion gross (for example, Cramton et al. 2015)."
+"Auction 97 gross bids, published (rounded, $)",44900000000,"Widely reported as $44.9 billion gross (for example, Cramton and Sujarittanonta 2015)."
 "Auction 113 gross bids, published ($)",3572889200,"FCC Public Notice DA 26-633 (June 26, 2026)."
 "Auction 113 net bids, published ($)",3572347950,"FCC Public Notice DA 26-633, Attachment A (sum of bidder net payments)."
 "Auction 113 licenses won, published",200,FCC Public Notice DA 26-633.
-Published Auction 97 unpaired $/MHz-pop,0.52,"Cramton et al., 'Bidding and Prices in the AWS-3 Auction' (2015). Independent cross-check."
-Published Auction 97 paired $/MHz-pop,2.72,Cramton et al. (2015).
+Published Auction 97 unpaired $/MHz-pop,0.52,"Cramton and Sujarittanonta, 'Bidding and Prices in the AWS-3 Auction' (2015). Independent cross-check."
+Published Auction 97 paired $/MHz-pop,2.72,Cramton and Sujarittanonta (2015).
 Net-to-gross ratio (Auction 113),0.999848511954975,Formula.
 "Alaska + Hawaii population, 2020 Census",2188662,"U.S. Census Bureau 2020: Alaska 733,391; Hawaii 1,455,271. Not in the Auction 110 PEA file."
 Market-size slope used for carrier PEA values,0.649792150233387,Defaults to the fitted Auction 97 B1 slope (Evidence). Override to test; 0 means flat $/pop.
 D2D exposure discount under PEA licensing,0,Extra cut to D2D per-PEA bids for the risk of not assembling a national footprint. Judgment; see License_Area sensitivity.
+"U.S. population, 2010 Census",308745538,U.S. Census Bureau (50 states and DC); equals the sum of PEA populations in FCC DA 14-759 App. A.
+Population of the five E Block EAs Qualcomm sold (2010),72187846,FCC 11-188 para. 15 lists the EAs; populations summed from FCC DA 14-759 App. A.

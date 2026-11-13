@@ -8,7 +8,29 @@ This plan follows workbook v0.4 and the working paper (`docs/working-paper.md`).
 add, in priority order, with the public data each item needs and the check that shows it worked.
 The literature review behind several items is in `docs/literature-review.md`.
 
-## Bottom line
+## Status (November 13, 2026, v0.5)
+
+Decisions (Nick, November 13): full 20 MHz; 2020–2025 MHz excluded; both downlink comparables used;
+no bidder list, only counts with a sensitivity sweep; no 110 percent test; gross revenue only.
+
+| Item | Status | Where |
+|---|---|---|
+| 1. 5 MHz scenario | Dropped (D1: full 20 MHz) | — |
+| 2. Terrestrial downlink comparables | Done: Qualcomm 700 MHz ($0.84, FCC 11-188) and 1670–1675 MHz lease ($0.12); Auction 46 price not retrievable | Workbook `Benchmarks`, `Transactions` |
+| 3. 110 percent rule | Dropped (gross only) | — |
+| 4. Adopted FNPRM | Done: paragraph citations; found the FCC's own $21.2B estimate (App. C) | Workbook `FNPRM`; paper §5.3 |
+| — Bidder counts | Done: named list replaced by counts; 0–6 sweep | Workbook `Scenarios`; `bidder_count_grid.csv` |
+| 5. NOAA zones | Done: county model reproduces NTIA Table 11; radius sweep | `zone_sweep.csv`; Figures 9–10 |
+| 6. Sharing calibration | Done on Auction 97 and US88 zones (adjacent band) instead of Auctions 105 and 110 | `aws3_zone_calibration.csv`; Figure 11 |
+| 7. Backtest | Done | `backtest.csv` |
+| 8. Income cross-check | Done, as the annual payment each price implies (FCC method); no operator financials used | `income_check.csv` |
+| 9. Adjacency | Done | `adjacency_demand_reduction.csv` |
+| 10. Package and demand-reduction stress tests | Done | `package_threshold.csv` |
+| 11. Sensitivity | Done (one-at-a-time tornado) | `tornado.csv`; Figure 8 |
+| 12–14. Literature, figures, structure | Done: executive summary, 11 figures, dataviz plan | `docs/working-paper.md`, `docs/dataviz-plan.md` |
+| 15. Review | Self-run checks done; outside review and IRAC coordination still needed | — |
+
+## Bottom line (as planned)
 
 Three findings from the literature and policy search change the scope, so they come first:
 

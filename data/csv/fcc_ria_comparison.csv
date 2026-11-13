@@ -1,0 +1,7 @@
+estimate,usd_per_mhz_pop,mhz,gross_usd,basis
+"FCC RIA, 25 MHz (App. C para. 4)",2.53,25,21193378382.0,"Auction 113 average, all blocks"
+"FCC RIA method, scaled to 20 MHz",2.53,20,16954702705.599998,"Same price, this paper's band"
+"FCC RIA low and high (±50%), 20 MHz",2.53,20,8477351353-25432054058,
+Auction 113 average recomputed from FCC data,2.5271398695265055,20,16752373854.819881,Mostly paired licenses
+"Auction 97 unpaired (A1 + B1) price, 20 MHz",0.5219933610807408,20,3460286484.339699,Terrestrial uplink base
+"This paper, central (S1)",0.6145190908151645,20,4073638216.2292,"Third-highest bid, 3 D2D and 4 terrestrial"

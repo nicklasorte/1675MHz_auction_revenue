@@ -1,0 +1,8 @@
+measure,value,note
+split_half_median_abs_error_per_license,0.49298056433391885,200 random halves of the 174 B1 licenses; market-size curve calibrated on the training half
+split_half_median_abs_error_flat_price,4.013737297802923,"Same splits, one national price per pop"
+split_half_aggregate_revenue_error_median,0.002330696959112477,Population-weighted hold-out revenue
+split_half_aggregate_revenue_error_p10,-0.2394103441980846,
+split_half_aggregate_revenue_error_p90,0.29784095560386525,
+auction113_BEA049-B1_predicted_vs_actual,0.1865914322697677,Cincinnati-Hamilton OH-KY-IN B1: predicted $0.410 vs actual $0.346 per MHz-pop (2015 curve x flat ratio)
+auction113_BEA102-A1_predicted_vs_actual,-0.7889241661378958,Davenport-Moline IA-IL A1: predicted $0.158 vs actual $0.748 per MHz-pop (2015 curve x flat ratio)

@@ -8,11 +8,13 @@ import sys
 
 from openpyxl import load_workbook
 
-# Headline results as delivered on November 10, 2026 (gross bids, $, before federal coordination).
+# Headline results as delivered on November 10, 2026 (v0.4) and November 13, 2026 (v0.5) (gross bids, $, before federal coordination).
 EXPECTED = {
     ("Scenarios", "B47"): 4073638216,   # S1 central (nationwide)
     ("Scenarios", "C47"): 5142857143,   # S2 D2D downlink value
     ("Scenarios", "I47"): 3460286484,   # S8 lease-only SCS
+    ("Scenarios", "F47"): 5142857143,   # S5 all downlink (v0.5)
+    ("Scenarios", "J47"): 4073638216,   # S9 terrestrial downlink (v0.5)
     ("License_Area", "C20"): 4649631172,  # UE uplink, PEA only
     ("License_Area", "C21"): 5212968610,  # D2D downlink, PEA only
     ("License_Area", "B78"): 4649631172,  # UE uplink, PEA + packages

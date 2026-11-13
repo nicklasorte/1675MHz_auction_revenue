@@ -1,0 +1,3 @@
+bidder_class,value_multiplier,meaning
+D2D,1,"Satellite direct-to-device operators. Value the band at the satellite uplink (SUL) or D2D downlink (SDL) benchmark. One of them may hold adjacent spectrum (adjacency premium, Inputs)."
+Carrier,1,Terrestrial mobile operators and other terrestrial bidders. Value the band at the terrestrial uplink (TUL) or terrestrial downlink (TDL) benchmark.

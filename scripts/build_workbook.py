@@ -1,7 +1,8 @@
-"""Build 1675-1695 MHz auction valuation workbook, v0.3 (adds nationwide vs PEA licensing and nationwide package bids).
+"""Build the 1675-1695 MHz auction valuation workbook, v0.5 (bidder counts instead of a named list; terrestrial
+downlink restored with two unpaired-downlink comparables; adopted FNPRM citations; gross revenue only).
 
-Usage: python scripts/build_workbook.py <processed_dir> <out.xlsx> <pea_market.csv>
-processed_dir holds a97_licenses.csv and a113_licenses.csv from parse_auctions.py;
+Usage: python scripts/build_workbook.py <processed_dir> <out.xlsx> <pea_market.csv> [mc_draws.csv]
+processed_dir holds a97_licenses.csv and a113_licenses.csv from parse_auctions.py and pea_ea.csv from parse_geo.py;
 pea_market.csv is the FCC Auction 110 market file (data/raw/fcc_pea/a110_market.csv).
 Run ./reproduce.sh instead of calling this directly.
 """
@@ -23,6 +24,11 @@ MC_OUT = Path(sys.argv[4]) if len(sys.argv) > 4 else None  # optional CSV of eve
 PEAS = list(csv.DictReader(open(PEA_FILE, encoding="utf-8-sig")))
 A97 = list(csv.DictReader(open(DATA / "a97_licenses.csv")))
 A113 = list(csv.DictReader(open(DATA / "a113_licenses.csv")))
+PEA_EA = list(csv.DictReader(open(DATA / "pea_ea.csv")))
+# Lower 700 MHz E Block EAs Qualcomm sold to AT&T: New York, Boston, Philadelphia, Los Angeles, San Francisco
+# (FCC 11-188, para. 15). EA numbers from FCC DA 14-759 Appendix A.
+QC_EAS = {10, 3, 12, 160, 163}
+QC_E_POP = sum(int(r["population_2010"]) for r in PEA_EA if int(r["ea"]) in QC_EAS)
 
 F = "Arial"
 BLUE, BLACK, GREEN = Font(name=F, color="0000FF"), Font(name=F), Font(name=F, color="008000")
@@ -96,30 +102,31 @@ INP = {}
 inputs = [
     ("pop", "U.S. population, 2020 Census", 331449281, INT, None,
      "U.S. Census Bureau, 2020 Census resident population (50 states and DC)."),
-    ("mhz", "Block size (MHz)", 10, INT, None, "FNPRM proposal: two unpaired 10 MHz blocks (Covington summary)."),
-    ("blocks", "Number of blocks", 2, INT, None, "FNPRM proposal."),
+    ("mhz", "Block size (MHz)", 10, INT, None, "FNPRM para. 48: two unpaired 10 MHz blocks (1675-1685 and 1685-1695 MHz)."),
+    ("blocks", "Number of blocks", 2, INT, None, "FNPRM para. 48. The 2020-2025 MHz block is out of scope."),
     ("reserve", "Reserve price per block ($)", 0, USD, YELLOW,
      "Not known. Used only when fewer unit bids than blocks plus one."),
     ("avail", "Federal coordination availability", "=Coordination!B5", PCT, None,
      "Deferred; 100% until zones are modeled."),
-    ("spx2", "SpaceX value of a second block (share of first)", 1.0, PCT, YELLOW,
-     "Used only when SpaceX wants both blocks. Demand reduction then decides whether it bids for two."),
-    ("dlshare", "TDL: downlink share of paired AWS-3 value", 0.5, PCT, YELLOW,
-     "Assumption with no evidence. Feeds the TDL high case only. TDL scenarios are suspended."),
-    ("noaa", "NOAA transition cost paid from proceeds ($)", 0, USD, YELLOW, "Unknown. Enter when public."),
+    ("spx2", "Lead D2D bidder's value of a second block (share of first)", 1.0, PCT, YELLOW,
+     "Used only when one D2D bidder wants both blocks. Demand reduction then decides whether it bids for two."),
+    ("caprate", "Capitalization rate for the 1670-1675 MHz lease", 0.07, PCT, YELLOW,
+     "FNPRM App. C, para. 4 converts auction values to annual payments at 7% (OMB Circular A-4)."),
+    ("adj", "Adjacency premium for the lead D2D bidder (share of its value)", 0.0, PCT, YELLOW,
+     "A bidder next to the band may value it more (Ausubel et al. 1997). 0 by default; swept in analysis.py."),
     ("pub97net", "Auction 97 net bids, published ($)", 41329673325, USD, None,
      "FCC Public Notice DA 15-131 (Jan 30, 2015), para. 1."),
     ("pub97n", "Auction 97 licenses won, published", 1611, INT, None, "FCC Public Notice DA 15-131."),
     ("pub97gross", "Auction 97 gross bids, published (rounded, $)", 44900000000, USD, None,
-     "Widely reported as $44.9 billion gross (for example, Cramton et al. 2015)."),
+     "Widely reported as $44.9 billion gross (for example, Cramton and Sujarittanonta 2015)."),
     ("pub113gross", "Auction 113 gross bids, published ($)", 3572889200, USD, None,
      "FCC Public Notice DA 26-633 (June 26, 2026)."),
     ("pub113net", "Auction 113 net bids, published ($)", 3572347950, USD, None,
      "FCC Public Notice DA 26-633, Attachment A (sum of bidder net payments)."),
     ("pub113n", "Auction 113 licenses won, published", 200, INT, None, "FCC Public Notice DA 26-633."),
     ("cramU", "Published Auction 97 unpaired $/MHz-pop", 0.52, PMP, None,
-     "Cramton et al., 'Bidding and Prices in the AWS-3 Auction' (2015). Independent cross-check."),
-    ("cramP", "Published Auction 97 paired $/MHz-pop", 2.72, PMP, None, "Cramton et al. (2015)."),
+     "Cramton and Sujarittanonta, 'Bidding and Prices in the AWS-3 Auction' (2015). Independent cross-check."),
+    ("cramP", "Published Auction 97 paired $/MHz-pop", 2.72, PMP, None, "Cramton and Sujarittanonta (2015)."),
     ("net2gross", "Net-to-gross ratio (Auction 113)", "=B17/B16", '0.0000%', None, "Formula."),
     ("akhi", "Alaska + Hawaii population, 2020 Census", 2188662, INT, None,
      "U.S. Census Bureau 2020: Alaska 733,391; Hawaii 1,455,271. Not in the Auction 110 PEA file."),
@@ -128,6 +135,10 @@ inputs = [
     ("exposure", "D2D exposure discount under PEA licensing", 0.0, PCT, YELLOW,
      "Extra cut to D2D per-PEA bids for the risk of not assembling a national footprint. "
      "Judgment; see License_Area sensitivity."),
+    ("pop10", "U.S. population, 2010 Census", 308745538, INT, None,
+     "U.S. Census Bureau (50 states and DC); equals the sum of PEA populations in FCC DA 14-759 App. A."),
+    ("qcE", "Population of the five E Block EAs Qualcomm sold (2010)", QC_E_POP, INT, None,
+     "FCC 11-188 para. 15 lists the EAs; populations summed from FCC DA 14-759 App. A."),
 ]
 for i, (key, lab, val, fmt, fill, src) in enumerate(inputs, 5):
     put(ws, f"A{i}", lab)
@@ -139,8 +150,8 @@ for i, (key, lab, val, fmt, fill, src) in enumerate(inputs, 5):
 ws = sheet("Coordination", "Federal coordination (deferred)", [44, 14, 80])
 put(ws, "A5", "Population availability after coordination")
 put(ws, "B5", 1.0, fmt=PCT, fill=YELLOW)
-put(ws, "C5", "DEFERRED. Placeholder of 100%. When zones return, model them as declining over time "
-    "(weather broadcast use is expected to fall after GOES-R retires, around 2033).", wrap=True)
+put(ws, "C5", "Headline figures are before coordination (100%). The NOAA zone analysis (four DCS sites, NTIA "
+    "Report 24-01 distances and smaller radii) is in scripts/analysis.py; results in data/csv/zone_*.csv.", wrap=True)
 put(ws, "A7", LABEL, MARK)
 
 # ======================================================== Raw_A97
@@ -312,6 +323,16 @@ tx = [
     ("Amazon / Globalstar (cross-check only)", 11570000000, 25, 1, "Company",
      "Announced Apr 14, 2026; FCC approved Oct 27, 2026. Enterprise value with satellites, the Apple "
      "agreement, and global MSS rights. Not used in any benchmark."),
+    ("Qualcomm 700 MHz D and E Blocks to AT&T (unpaired downlink)", 1925000000, 12,
+     f"=({INP['pop10']}+{INP['qcE']})/(2*{INP['pop']})", "Cash",
+     "FCC 11-188 (Dec. 22, 2011), paras. 1, 15: $1.925B for six D Block licenses (6 MHz nationwide) and five E Block "
+     "EA licenses (6 MHz in NY, Boston, Philadelphia, LA, SF). Coverage column makes MHz-pops = 6 x 2010 U.S. pop + "
+     "6 x E Block EA pop. Used for supplemental downlink. 700 MHz low band: likely overstates 1.7 GHz."),
+    ("1670-1675 MHz nationwide lease (capitalized)", f"=13000000/{INP['caprate']}", 5,
+     f"={INP['pop10']}/{INP['pop']}", "Lease",
+     "Crown Castle leased its 1670-1675 MHz license for $13M a year (TV Technology, July 27, 2007); capitalized "
+     "as a perpetuity at the Inputs rate; 2010 population. Adjacent to the band. Auction 46 price (2003) not "
+     "retrievable from FCC records here."),
 ]
 TX = {}
 for i, (name, price, mhz, cov, pay, src) in enumerate(tx, 5):
@@ -322,7 +343,7 @@ for i, (name, price, mhz, cov, pay, src) in enumerate(tx, 5):
     put(ws, f"E{i}", f"=B{i}/(C{i}*D{i}*{INP['pop']})", fmt=PMP)
     put(ws, f"F{i}", pay)
     put(ws, f"G{i}", src, wrap=True)
-    put(ws, f"H{i}", "PENDING", BLUE, fill=YELLOW)
+    put(ws, f"H{i}", "VERIFIED (FCC 11-188)" if i == 9 else "PENDING", BLUE, fill=None if i == 9 else YELLOW)
     ws.row_dimensions[i].height = 62
     TX[i] = f"Transactions!$E${i}"
 
@@ -330,9 +351,10 @@ for i, (name, price, mhz, cov, pay, src) in enumerate(tx, 5):
 ws = sheet("Benchmarks", "Benchmark by use case (nominal $/MHz-pop)", [10, 13, 13, 13, 90])
 hdr(ws, 4, ["Use case", "Low", "Base", "High", "Basis"])
 bm = [
-    ("TDL", f"={EV['ab']}", f"={EV['ab']}", f"=2*{INP['dlshare']}*{EV['pr']}",
-     "SUSPENDED. No unpaired downlink comparable. Low and base: unpaired price. High: paired price × downlink "
-     "share × 2, because the paired $/MHz-pop is spread over both halves. Needs a real comparable."),
+    ("TDL", f"={TX[10]}", f"=AVERAGE({TX[9]},{TX[10]})", f"={TX[9]}",
+     "Two unpaired-downlink comparables. Low: the 1670-1675 MHz lease, capitalized (same band edge, thin "
+     "market). High: Qualcomm 700 MHz D and E Blocks sold to AT&T for supplemental downlink (low band, so a "
+     "ceiling). Base: their average."),
     ("TUL", f"={EV['q25']}", f"={EV['ab']}", f"={EV['b1']}",
      "Auction 97 unpaired 1695–1710 MHz. Low: B1 population-weighted 25th percentile. Base: A1 + B1. "
      "High: B1 (same 10 MHz block size)."),
@@ -351,123 +373,112 @@ for i, (u, lo, ba, hi, basis) in enumerate(bm, 5):
 UC, CASES, TABLE = "Benchmarks!$A$5:$A$8", "Benchmarks!$B$4:$D$4", "Benchmarks!$B$5:$D$8"
 
 # ======================================================== Bidders
-ws = sheet("Bidders", "Credible bidders", [20, 13, 11, 70])
-hdr(ws, 4, ["Bidder", "Class", "Value multiplier", "Why credible, and doubts (public sources)"])
-BIDDERS = [
-    ("SpaceX", "D2D", "Bought EchoStar AWS-4, H-block, and unpaired AWS-3 (~$19.6B) and Grain 800 MHz (~$8B). "
-     "Won B1 Cincinnati and one other license in Auction 113. Owns the adjacent 1695–1710 MHz."),
-    ("Amazon Leo", "D2D", "Acquired Globalstar (FCC approved Oct 27, 2026); D2D service planned from 2028."),
-    ("AST SpaceMobile", "D2D", "D2D operator backed by AT&T and Verizon; L-band arrangement with Ligado. "
-     "Doubt: capital (about $1.5B cash mid-2025; later raises reported but not verified here)."),
-    ("Carrier D2D JV", "D2D", "AT&T, Verizon, T-Mobile D2D spectrum-pooling JV (reported Oct 2026). Off by default."),
-    ("AT&T", "Carrier", "Largest Auction 97 winner; won 10 licenses in Auction 113."),
-    ("Verizon", "Carrier", "Won 82 licenses for $3.16B in Auction 113."),
-    ("T-Mobile", "Carrier", "Won 102 licenses in Auction 113."),
-    ("Ligado", "Adjacent", "Holds 1670–1675 MHz next to the lower block. Doubt: in Chapter 11 restructuring "
-     "(plan approved Sept 2025; claims still being settled in July 2026). Valued at the carrier benchmark."),
+ws = sheet("Bidders", "Bidder pool: number of bidders by class (no named list)", [22, 14, 80])
+hdr(ws, 4, ["Bidder class", "Value multiplier", "What the class means"])
+CLASSES = [
+    ("D2D", "Satellite direct-to-device operators. Value the band at the satellite uplink (SUL) or D2D downlink "
+     "(SDL) benchmark. One of them may hold adjacent spectrum (adjacency premium, Inputs)."),
+    ("Carrier", "Terrestrial mobile operators and other terrestrial bidders. Value the band at the terrestrial "
+     "uplink (TUL) or terrestrial downlink (TDL) benchmark."),
 ]
 MULT = {}
-for i, (n, cl, why) in enumerate(BIDDERS, 5):
-    put(ws, f"A{i}", n, BOLD)
-    put(ws, f"B{i}", cl)
-    put(ws, f"C{i}", 1.0, fmt=RAT)
-    put(ws, f"D{i}", why, wrap=True)
+for i, (cl, why) in enumerate(CLASSES, 5):
+    put(ws, f"A{i}", cl, BOLD)
+    put(ws, f"B{i}", 1.0, fmt=RAT)
+    put(ws, f"C{i}", why, wrap=True)
     ws.row_dimensions[i].height = 45
-    MULT[n] = f"Bidders!$C${i}"
-note(ws, "A14", "Bidder list: SpaceX, Amazon, the carriers (Nick, Nov 10, 2026); AST SpaceMobile and Ligado "
-     "added at Nick's request. Sign-off still open.", "D14")
+    MULT[cl] = f"Bidders!$B${i}"
+note(ws, "A8", "The workbook uses a number of bidders in each class, set per scenario on the Scenarios tab, not a "
+     "named list. The base case assumes three D2D and four terrestrial bidders. scripts/analysis.py sweeps 0-6 "
+     "bidders in each class (data/csv/bidder_count_grid.csv).", "C8", 45)
 
 # ======================================================== Scenarios
 ws = sheet("Scenarios", "Scenarios and pricing rule", [44] + [15] * 9)
 SC = [
-    # name, desc, case, carrier, d2d, SpX, Amz, AST, JV, ATT, VZ, TMO, Lig, spx2, include
-    ("S1 Base", "All bidders; D2D values the band as uplink (same-frequency evidence)", "Base", "TUL", "SUL",
-     1, 1, 1, 0, 1, 1, 1, 1, 0, "Y"),
-    ("S2 D2D downlink value", "All bidders; D2D values the band as downlink", "Base", "TUL", "SDL",
-     1, 1, 1, 0, 1, 1, 1, 1, 0, "Y"),
-    ("S3 Downlink, two D2D", "As S2 without AST and Ligado", "Base", "TUL", "SDL",
-     1, 1, 0, 0, 1, 1, 1, 0, 0, "Y"),
-    ("S4 SpaceX wants 20 MHz", "As S3; SpaceX may bid for both blocks (demand reduction applies)", "Base",
-     "TUL", "SDL", 1, 1, 0, 0, 1, 1, 1, 0, 1, "Y"),
-    ("S5 Carrier JV joins", "As S3 plus carrier D2D JV", "Base", "TUL", "SDL", 1, 1, 0, 1, 1, 1, 1, 0, 0, "Y"),
-    ("S6 Low", "All bidders; low benchmarks", "Low", "TUL", "SUL", 1, 1, 1, 0, 1, 1, 1, 1, 0, "Y"),
-    ("S7 High", "All bidders; high benchmarks, D2D downlink", "High", "TUL", "SDL",
-     1, 1, 1, 0, 1, 1, 1, 1, 0, "Y"),
-    ("S8 Lease-only SCS", "D2D firms lease SCS rights instead of bidding", "Base", "TUL", "SUL",
-     0, 0, 0, 0, 1, 1, 1, 1, 0, "Y"),
-    ("S9 Carriers downlink", "SUSPENDED: no downlink comparable", "Base", "TDL", "SUL",
-     1, 1, 1, 0, 1, 1, 1, 1, 0, "N"),
+    # name, desc, case, carrier use, d2d use, D2D bidders, terrestrial bidders, lead wants both, include
+    ("S1 Base", "3 D2D and 4 terrestrial bidders; D2D values the band as uplink (same-frequency evidence)",
+     "Base", "TUL", "SUL", 3, 4, 0, "Y"),
+    ("S2 D2D downlink value", "As S1; D2D values the band as downlink", "Base", "TUL", "SDL", 3, 4, 0, "Y"),
+    ("S3 Two D2D bidders", "As S2 with two D2D bidders", "Base", "TUL", "SDL", 2, 4, 0, "Y"),
+    ("S4 One D2D bidder wants 20 MHz", "As S3; the lead D2D bidder may bid for both blocks (demand reduction)",
+     "Base", "TUL", "SDL", 2, 4, 1, "Y"),
+    ("S5 All downlink", "As S2; terrestrial bidders also value the band as downlink", "Base", "TDL", "SDL",
+     3, 4, 0, "Y"),
+    ("S6 Low", "As S1 with low benchmarks", "Low", "TUL", "SUL", 3, 4, 0, "Y"),
+    ("S7 High", "As S2 with high benchmarks", "High", "TUL", "SDL", 3, 4, 0, "Y"),
+    ("S8 Lease-only SCS", "D2D operators lease SCS rights instead of bidding", "Base", "TUL", "SUL", 0, 4, 0, "Y"),
+    ("S9 Terrestrial downlink", "As S1; terrestrial bidders value the band as downlink", "Base", "TDL", "SUL",
+     3, 4, 0, "Y"),
 ]
-rows = ["Scenario", "Description", "Benchmark case (Low/Base/High)", "Carrier use case", "D2D use case",
-        "SpaceX participates", "Amazon Leo participates", "AST SpaceMobile participates",
-        "Carrier D2D JV participates", "AT&T participates", "Verizon participates", "T-Mobile participates",
-        "Ligado participates", "SpaceX wants both blocks", "Include in Summary range (Y/N)"]
+rows = ["Scenario", "Description", "Benchmark case (Low/Base/High)", "Terrestrial use case", "D2D use case",
+        "D2D bidders (0-6)", "Terrestrial bidders (0-6)", "Lead D2D bidder wants both blocks",
+        "Include in Summary range (Y/N)"]
 for k, lab in enumerate(rows, 4):
     put(ws, f"A{k}", lab)
 ws["A4"].font, ws["A4"].fill = HDR_FONT, HDR_FILL
-calc = {20: "Carrier $/MHz-pop", 21: "D2D $/MHz-pop", 22: "Carrier value per block ($)",
-        23: "D2D value per block ($)", 25: "Unit bid: SpaceX, block 1", 26: "Unit bid: Amazon Leo",
-        27: "Unit bid: AST SpaceMobile", 28: "Unit bid: Carrier D2D JV", 29: "Unit bid: AT&T",
-        30: "Unit bid: Verizon", 31: "Unit bid: T-Mobile", 32: "Unit bid: Ligado",
-        33: "Unit bid: SpaceX, block 2", 35: "Unit bids if SpaceX bids for one block",
-        36: "Unit bids if SpaceX bids for two", 37: "Price if SpaceX bids for one ($)",
-        38: "Price if SpaceX bids for two ($)", 39: "Other bids above SpaceX's value",
-        40: "SpaceX blocks won, bidding for one", 41: "SpaceX blocks won, bidding for two",
-        42: "SpaceX surplus, bidding for one ($)", 43: "SpaceX surplus, bidding for two ($)",
-        44: "SpaceX bids for two (demand reduction decides)", 45: "Clearing price per block ($)",
-        46: "Blocks sold", 47: "Gross revenue ($)", 48: "Implied $/MHz-pop", 49: "Lowest winning value ($)",
-        50: "Blocks won by D2D bidders", 51: "Winning class", 52: "Every winner's value ≥ price",
-        53: "Label"}
-put(ws, "A19", "Calculation", BOLD)
+calc = {14: "Terrestrial $/MHz-pop", 15: "D2D $/MHz-pop", 16: "Terrestrial value per block ($)",
+        17: "D2D value per block ($)", 18: "Lead D2D bidder value per block, with adjacency premium ($)"}
+for k in range(6):
+    calc[19 + k] = f"Unit bid: D2D bidder {k + 1}" + (" (lead)" if k == 0 else "")
+    calc[25 + k] = f"Unit bid: terrestrial bidder {k + 1}"
+calc.update({31: "Unit bid: lead D2D bidder, block 2", 32: "Unit bids if the lead bids for one block",
+             33: "Unit bids if the lead bids for two", 34: "Price if the lead bids for one ($)",
+             35: "Price if the lead bids for two ($)", 36: "Other bids above the lead's value",
+             37: "Lead blocks won, bidding for one", 38: "Lead blocks won, bidding for two",
+             39: "Lead surplus, bidding for one ($)", 40: "Lead surplus, bidding for two ($)",
+             41: "Lead bids for two (demand reduction decides)", 45: "Clearing price per block ($)",
+             46: "Blocks sold", 47: "Gross revenue ($)", 48: "Implied $/MHz-pop", 49: "Lowest winning value ($)",
+             50: "Blocks won by D2D bidders", 51: "Winning class", 52: "Every winner's value ≥ price",
+             53: "Label"})
+put(ws, "A13", "Calculation", BOLD)
 for r, lab in calc.items():
     put(ws, f"A{r}", lab, BOLD if r in (45, 47) else None)
 B, MH, POP, AV, RES = INP["blocks"], INP["mhz"], INP["pop"], INP["avail"], INP["reserve"]
-order = ["SpaceX", "Amazon Leo", "AST SpaceMobile", "Carrier D2D JV", "AT&T", "Verizon", "T-Mobile", "Ligado"]
 for j, s in enumerate(SC):
     c = get_column_letter(2 + j)
     hdr(ws, 4, [s[0]], col=2 + j)
     for k, v in enumerate(s[1:], 5):
         put(ws, f"{c}{k}", v, BLUE, wrap=(k == 5))
     look = lambda use: f"=INDEX({TABLE},MATCH({use},{UC},0),MATCH({c}6,{CASES},0))"
-    put(ws, f"{c}20", look(f"{c}7"), fmt=PMP)
-    put(ws, f"{c}21", look(f"{c}8"), fmt=PMP)
-    put(ws, f"{c}22", f"={c}20*{MH}*{POP}*{AV}", fmt=USD)
-    put(ws, f"{c}23", f"={c}21*{MH}*{POP}*{AV}", fmt=USD)
-    for k, name in enumerate(order):
-        r = 25 + k
-        part = f"{c}{9 + k}"
-        base = f"{c}23" if k < 4 else f"{c}22"
-        put(ws, f"{c}{r}", f"={base}*{MULT[name]}*{part}", fmt=USD)
-    put(ws, f"{c}33", f"={c}25*{c}17*{INP['spx2']}", fmt=USD)
-    put(ws, f"{c}35", f'=COUNTIF({c}25:{c}32,">0")', fmt=INT)
-    put(ws, f"{c}36", f'=COUNTIF({c}25:{c}33,">0")', fmt=INT)
-    put(ws, f"{c}37", f"=IF({c}35>{B},MAX(LARGE({c}25:{c}32,{B}+1),{RES}),{RES})", fmt=USD)
-    put(ws, f"{c}38", f"=IF({c}36>{B},MAX(LARGE({c}25:{c}33,{B}+1),{RES}),{RES})", fmt=USD)
-    put(ws, f"{c}39", f'=COUNTIF({c}26:{c}32,">"&{c}25)', fmt=INT)
-    put(ws, f"{c}40", f"=IF({c}25>0,IF({c}39>={B},0,1),0)", fmt=INT)
-    put(ws, f"{c}41", f'=IF(AND({c}25>0,{c}17=1),IF({c}39<{B},1,0)+IF(AND({c}33>0,COUNTIF({c}26:{c}32,">"&{c}33)<={B}-2),1,0),0)', fmt=INT)
-    put(ws, f"{c}42", f"={c}40*({c}25-{c}37)", fmt=USD)
-    put(ws, f"{c}43", f"={c}41*({c}33-{c}38)+MIN({c}41,1)*({c}25-{c}33)", fmt=USD)
-    put(ws, f"{c}44", f"=IF(AND({c}17=1,{c}43>{c}42),1,0)", fmt=INT)
-    put(ws, f"{c}45", f"=IF({c}44=1,{c}38,{c}37)", BOLD, fmt=USD)
-    put(ws, f"{c}46", f"=MIN({B},IF({c}44=1,{c}36,{c}35))", fmt=INT)
+    put(ws, f"{c}14", look(f"{c}7"), fmt=PMP)
+    put(ws, f"{c}15", look(f"{c}8"), fmt=PMP)
+    put(ws, f"{c}16", f"={c}14*{MH}*{POP}*{AV}*{MULT['Carrier']}", fmt=USD)
+    put(ws, f"{c}17", f"={c}15*{MH}*{POP}*{AV}*{MULT['D2D']}", fmt=USD)
+    put(ws, f"{c}18", f"={c}17*(1+{INP['adj']})", fmt=USD)
+    for k in range(6):
+        put(ws, f"{c}{19 + k}", f"=IF({c}9>={k + 1},{c}{18 if k == 0 else 17},0)", fmt=USD)
+        put(ws, f"{c}{25 + k}", f"=IF({c}10>={k + 1},{c}16,0)", fmt=USD)
+    put(ws, f"{c}31", f"={c}19*{c}11*{INP['spx2']}", fmt=USD)
+    put(ws, f"{c}32", f'=COUNTIF({c}19:{c}30,">0")', fmt=INT)
+    put(ws, f"{c}33", f'=COUNTIF({c}19:{c}31,">0")', fmt=INT)
+    put(ws, f"{c}34", f"=IF({c}32>{B},MAX(LARGE({c}19:{c}30,{B}+1),{RES}),{RES})", fmt=USD)
+    put(ws, f"{c}35", f"=IF({c}33>{B},MAX(LARGE({c}19:{c}31,{B}+1),{RES}),{RES})", fmt=USD)
+    put(ws, f"{c}36", f'=COUNTIF({c}20:{c}30,">"&{c}19)', fmt=INT)
+    put(ws, f"{c}37", f"=IF({c}19>0,IF({c}36>={B},0,1),0)", fmt=INT)
+    put(ws, f"{c}38", f'=IF(AND({c}19>0,{c}11=1),IF({c}36<{B},1,0)+IF(AND({c}31>0,COUNTIF({c}20:{c}30,">"&{c}31)<={B}-2),1,0),0)', fmt=INT)
+    put(ws, f"{c}39", f"={c}37*({c}19-{c}34)", fmt=USD)
+    put(ws, f"{c}40", f"={c}38*({c}31-{c}35)+MIN({c}38,1)*({c}19-{c}31)", fmt=USD)
+    put(ws, f"{c}41", f"=IF(AND({c}11=1,{c}40>{c}39),1,0)", fmt=INT)
+    put(ws, f"{c}45", f"=IF({c}41=1,{c}35,{c}34)", BOLD, fmt=USD)
+    put(ws, f"{c}46", f"=MIN({B},IF({c}41=1,{c}33,{c}32))", fmt=INT)
     put(ws, f"{c}47", f"={c}45*{c}46", BOLD, fmt=USD)
     put(ws, f"{c}48", f"=IF({c}46>0,{c}47/({c}46*{MH}*{POP}),0)", fmt=PMP)
-    put(ws, f"{c}49", f"=IFERROR(IF({c}44=1,LARGE({c}25:{c}33,{B}),LARGE({c}25:{c}32,{B})),0)", fmt=USD)
-    put(ws, f"{c}50", f"=MIN({c}46,IF({c}44=1,{c}41,{c}40)+SUMPRODUCT(({c}26:{c}28>={c}49)*({c}26:{c}28>0)))",
+    put(ws, f"{c}49", f"=IFERROR(IF({c}41=1,LARGE({c}19:{c}31,{B}),LARGE({c}19:{c}30,{B})),0)", fmt=USD)
+    put(ws, f"{c}50", f"=MIN({c}46,IF({c}41=1,{c}38,{c}37)+SUMPRODUCT(({c}20:{c}24>={c}49)*({c}20:{c}24>0)))",
         fmt=INT)
-    put(ws, f"{c}51", f'=IF({c}46=0,"None",IF({c}50>={c}46,"D2D",IF({c}50=0,"Carrier/adjacent","Split")))')
+    put(ws, f"{c}51", f'=IF({c}46=0,"None",IF({c}50>={c}46,"D2D",IF({c}50=0,"Terrestrial","Split")))')
     put(ws, f"{c}52", f"=OR({c}46=0,{c}49>={c}45)")
     put(ws, f"{c}53", LABEL, MARK, wrap=True)
     ws.column_dimensions[c].width = 16
 ws.row_dimensions[5].height = 75
 ws.row_dimensions[53].height = 30
-for r in (25, 33):
+for r in (19, 31):
     ws[f"A{r}"].fill = GREY
-note(ws, "A55", "Pricing rule: each bidder wants one 10 MHz block; SpaceX may want two. The uniform clock price "
-     "stops at the highest losing unit bid. Demand reduction: SpaceX bids for two blocks only if that leaves it "
-     "more surplus than bidding for one. Unit bid = benchmark $/MHz-pop × 10 MHz × 2020 population × "
-     "availability × bidder multiplier. Ligado is valued at the carrier benchmark.", "J55", 60)
+note(ws, "A55", "Pricing rule: each bidder wants one 10 MHz block; the lead D2D bidder may want two. The uniform "
+     "clock price stops at the highest losing unit bid. Demand reduction: the lead bids for two blocks only if that "
+     "leaves it more surplus than bidding for one. Unit bid = benchmark $/MHz-pop × 10 MHz × 2020 population × "
+     "availability × class multiplier (× 1 + adjacency premium for the lead D2D bidder). Up to six bidders per "
+     "class.", "J55", 60)
 ws.freeze_panes = "B5"
 LASTC = get_column_letter(1 + len(SC))
 SCR = lambda r: f"Scenarios!$B${r}:${LASTC}${r}"
@@ -513,8 +524,8 @@ rng = random.Random(1675)
 N = 10000
 rev, d2d_sets, draws = [], 0, []
 for _ in range(N):
-    carriers = [tul_base * math.exp(rng.gauss(0, sigma)) for _ in range(4)]  # AT&T, VZ, TMO, Ligado
-    d2d = [rng.uniform(spx113, sdl_base) for _ in range(3)]  # SpaceX, Amazon, AST
+    carriers = [tul_base * math.exp(rng.gauss(0, sigma)) for _ in range(4)]  # four terrestrial bidders
+    d2d = [rng.uniform(spx113, sdl_base) for _ in range(3)]  # three D2D bidders
     vals = sorted(carriers + d2d, reverse=True)
     price = vals[2]
     if price in d2d:
@@ -525,10 +536,9 @@ if MC_OUT:
     MC_OUT.parent.mkdir(parents=True, exist_ok=True)
     with open(MC_OUT, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["draw", "att_usd_per_mhz_pop", "verizon_usd_per_mhz_pop", "tmobile_usd_per_mhz_pop",
-                    "ligado_usd_per_mhz_pop", "spacex_usd_per_mhz_pop", "amazon_leo_usd_per_mhz_pop",
-                    "ast_spacemobile_usd_per_mhz_pop", "clearing_price_usd_per_mhz_pop", "price_set_by",
-                    "gross_revenue_usd"])
+        w.writerow(["draw"] + [f"terrestrial_{k}_usd_per_mhz_pop" for k in range(1, 5)]
+                   + [f"d2d_{k}_usd_per_mhz_pop" for k in range(1, 4)]
+                   + ["clearing_price_usd_per_mhz_pop", "price_set_by", "gross_revenue_usd"])
         for k, d in enumerate(draws, 1):
             w.writerow([k] + d)
 rev.sort()
@@ -541,12 +551,12 @@ ws.merge_cells("A3:C3")
 ws.row_dimensions[3].height = 30
 hdr(ws, 5, ["Item", "Value", "Note"])
 mc = [
-    ("Carrier value: TUL base × lognormal", tul_base, PMP, "AT&T, Verizon, T-Mobile, Ligado"),
+    ("Terrestrial value: TUL base × lognormal", tul_base, PMP, "Four terrestrial bidders"),
     ("Carrier spread (σ of log price relative to auction average)", sigma, RAT,
      "From Auction 97 paired prices of winners that spent over $1B"),
-    ("D2D value: uniform, low end ($/MHz-pop)", spx113, PMP, "SpaceX's Auction 113 B1 price"),
+    ("D2D value: uniform, low end ($/MHz-pop)", spx113, PMP, "Three D2D bidders; low end is SpaceX's Auction 113 B1 price"),
     ("D2D value: uniform, high end ($/MHz-pop)", sdl_base, PMP, "Grain prior market price"),
-    ("Draws", N, INT, "SpaceX bids for one block (demand reduction)."),
+    ("Draws", N, INT, "Each bidder bids for one block (demand reduction). Bidder-count sweep in analysis.py."),
     ("Gross revenue, 10th percentile ($)", pct(0.10), USDB, LABEL),
     ("Gross revenue, median ($)", pct(0.50), USDB, LABEL),
     ("Gross revenue, 90th percentile ($)", pct(0.90), USDB, LABEL),
@@ -566,40 +576,28 @@ note(ws, "A17", "Illustrative only. The D2D value range is a judgment, not evide
 MCPY = dict(tul_base=tul_base, sul_base=sul_base, spx113=spx113, sdl_base=sdl_base, share=share,
             p10=pct(.1), p50=pct(.5), p90=pct(.9), d2d=d2d_sets / N, sigma=sigma)
 
-# ======================================================== Revenue_Defs
-ws = sheet("Revenue_Defs", "Revenue definitions", [34] + [15] * 9)
-hdr(ws, 4, ["Measure"] + [s[0] for s in SC])
-put(ws, "A3", LABEL + ".", MARK)
-for i, lab in enumerate(["Gross bids ($)", "Net bids at Auction 113 credit rate ($)", "Net of NOAA costs ($)",
-                         "Budget score", "Net bids at Auction 97 credit rate ($)"], 5):
-    put(ws, f"A{i}", lab)
-for j in range(len(SC)):
-    c = get_column_letter(2 + j)
-    put(ws, f"{c}5", f"=Scenarios!{c}47", fmt=USD)
-    put(ws, f"{c}6", f"={c}5*{INP['net2gross']}", fmt=USD)
-    put(ws, f"{c}7", f"={c}6-{INP['noaa']}", fmt=USD)
-    put(ws, f"{c}8", "Outside model")
-    put(ws, f"{c}9", f"={c}5*{EV['n97']}/{EV['g97']}", fmt=USD)
-note(ws, "A11", "Headline uses gross bids. Auction 97's credit rate was about 8%; Auction 113's was near zero. If the Commercial Spectrum Enhancement Act applies, proceeds must "
-     "reach 110% of federal relocation or sharing costs. Confirm with counsel.", "J11")
-
 # ======================================================== FNPRM
 ws = sheet("FNPRM", "FNPRM proposals used (FCC 26-70, WT Docket No. 26-284)", [46, 46, 26, 20])
 hdr(ws, 4, ["Proposal", "Model input it drives", "Source", "Paragraph (adopted text)"])
-fn = [("Two unpaired 10 MHz blocks", "Inputs: block size, number of blocks"),
-      ("Alternative: unpaired 5 MHz blocks", "Not yet modeled"),
-      ("Uplink, downlink, or TDD at licensee's choice", "Bidders value the license at their use case"),
-      ("Secondary MSS allocation for SCS", "D2D bidder class; S8 lease-only"),
-      ("License area: nationwide, regional, or PEA", "Nationwide only in v0.2"),
-      ("Bundling and all-or-nothing nationwide package bids", "Not yet modeled"),
-      ("Terrestrial buildout 45% and 80%", "Open question for D2D winners"),
-      ("Small-business and rural bidding credits", "Net-to-gross ratio"),
-      ("Coordination near four NOAA DCS sites", "Coordination tab (deferred)")]
-for i, (p, m) in enumerate(fn, 5):
-    put(ws, f"A{i}", p, wrap=True)
+fn = [("Two unpaired 10 MHz blocks (1675-1685, 1685-1695 MHz); a 5 MHz block at 2020-2025 MHz",
+       "Inputs: block size, number of blocks. 2020-2025 MHz out of scope", "48"),
+      ("Alternative band plans", "Not modeled", "54-55"),
+      ("Unpaired; licensee chooses FDD or TDD, uplink or downlink", "Use cases TUL, TDL, SUL, SDL", "52"),
+      ("Co-primary fixed and mobile; secondary MSS for domestic SCS", "D2D bidder class; S8 lease-only", "30-34"),
+      ("License area: nationwide, REAG, or PEA, or different sizes by block", "License_Area tab", "43-44, 51"),
+      ("Bundling and all-or-nothing nationwide package bids to reduce exposure risk",
+       "License_Area rows 72-91", "75-78"),
+      ("15-year license term", "Income cross-check in analysis.py", "56"),
+      ("Performance requirements", "Not modeled", "57-68"),
+      ("Small-business and rural bidding credits", "Not modeled (gross revenue only)", "79-81"),
+      ("Coordination zones around four NOAA DCS sites", "Zone analysis in analysis.py", "101-102"),
+      ("FCC's own estimate: $21.2B for 25 MHz at the Auction 113 average ($2.53/MHz-pop), ±50%",
+       "Compared in the working paper", "App. C, para. 4")]
+for i, (pp, m, para) in enumerate(fn, 5):
+    put(ws, f"A{i}", pp, wrap=True)
     put(ws, f"B{i}", m, wrap=True)
-    put(ws, f"C{i}", "Covington, Oct 13, 2026 (draft)", wrap=True)
-    put(ws, f"D{i}", "PENDING", BLUE, fill=YELLOW)
+    put(ws, f"C{i}", "FCC 26-70 (adopted Oct. 29, 2026)", wrap=True)
+    put(ws, f"D{i}", para, BLUE)
 
 
 # ======================================================== PEA
@@ -611,9 +609,9 @@ ws.merge_cells("A3:M3")
 ws.row_dimensions[3].height = 30
 hdr(ws, 4, ["PEA", "Name", "Population (2010)", "Population (2020, scaled)", "pop^slope",
             "Carrier $/MHz-pop", "Uplink price $/MHz-pop", "Uplink revenue ($)", "Uplink winner",
-            "Downlink price $/MHz-pop", "Downlink revenue ($)", "Downlink winner", "NOAA DCS site (verify)"])
-SITES = {"PEA005": "Suitland, MD", "PEA147": "Wallops Island, VA (Delmarva)", "PEA114": "Fairmont, WV",
-         "PEA286": "Sioux Falls, SD"}
+            "Downlink price $/MHz-pop", "Downlink revenue ($)", "Downlink winner", "NOAA DCS site (county)"])
+SITES = {"PEA005": "Suitland, MD (Prince George's)", "PEA147": "Wallops, VA (Accomack)",
+         "PEA114": "Fairmont, WV (Marion)", "PEA286": "Sioux Falls, SD (Minnehaha)"}  # FCC DA 14-759 App. B
 LA = lambda r: f"License_Area!$B${r}"
 scale = f"(({INP['pop']}-{INP['akhi']})/SUM($C${pr0}:$C${pr1 - 1}))"
 for i, r in enumerate(PEAS, pr0):
@@ -632,7 +630,9 @@ for i in range(pr0, pr1 + 1):
     put(ws, f"E{i}", f"=C{i}^{INP['slope']}", fmt='0.00')
     put(ws, f"F{i}", f"={LA(6)}*{LA(15)}*E{i}", fmt=PMP)
     for pc, rc, wc, d in (("G", "H", "I", LA(13)), ("J", "K", "L", LA(14))):
-        put(ws, f"{pc}{i}", f"=IF(AND({LA(17)}>={INP['blocks']}+1,{d}>F{i}),{d},F{i})", fmt=PMP)
+        nd, nc, bb = LA(17), LA(16), INP["blocks"]
+        put(ws, f"{pc}{i}", f"=IF({d}>F{i},IF({nd}>={bb}+1,{d},IF({nd}+{nc}>={bb}+1,F{i},0)),"
+                            f"IF({nc}>={bb}+1,F{i},IF({nc}+{nd}>={bb}+1,{d},0)))", fmt=PMP)
         put(ws, f"{rc}{i}", f"={pc}{i}*{INP['blocks']}*{INP['mhz']}*D{i}*{INP['avail']}", fmt=USD)
         put(ws, f"{wc}{i}", f'=IF({d}>F{i},"D2D","Carrier")')
 ws.freeze_panes = "C5"
@@ -640,7 +640,7 @@ PR = lambda col: f"PEA!${col}${pr0}:${col}${pr1}"
 
 # ======================================================== License_Area
 ws = sheet("License_Area", "Nationwide vs PEA licensing: UE uplink and D2D downlink", [58, 17, 17, 17, 14, 16, 14])
-put(ws, "A3", LABEL + ". Bidders as in S1 (uplink) and S2 (downlink).", MARK)
+put(ws, "A3", LABEL + ". Bidder counts as in S1 (uplink) and S2 (downlink).", MARK)
 hdr(ws, 4, ["Input", "Value", "Note"])
 la = [
     (5, "Carrier base $/MHz-pop (TUL)", "=Benchmarks!$C$6", PMP, "National average; PEA values spread around it"),
@@ -656,8 +656,8 @@ la = [
     (14, "D2D downlink bid per PEA $/MHz-pop", "=B8/IF(B10=1,B9,1)*(1-B11)", PMP, ""),
     (15, "Calibration constant k", f"=SUM({PR('D')})/SUMPRODUCT({PR('D')},{PR('E')})", '0.000000E+0',
      "Keeps the population-weighted average carrier value at the national base"),
-    (16, "Carrier bidders per PEA", "=SUM(Scenarios!$B$13:$B$16)", INT, "AT&T, Verizon, T-Mobile, Ligado (S1)"),
-    (17, "D2D bidders per PEA", "=SUM(Scenarios!$B$9:$B$12)", INT, "SpaceX, Amazon, AST (S1)"),
+    (16, "Terrestrial bidders per PEA", "=Scenarios!$B$10", INT, "As S1"),
+    (17, "D2D bidders per PEA", "=Scenarios!$B$9", INT, "As S1"),
 ]
 for r, lab, val, fmt, nt in la:
     put(ws, f"A{r}", lab)
@@ -720,7 +720,7 @@ for k_, (lab, sv) in enumerate([("0 (flat $/pop)", 0), ("Half the fitted slope",
     put(ws, f"E{r}", f"=C{r}-$B$21", fmt=USDB)
 
 # NOAA PEAs
-put(ws, "A39", "PEAs with a NOAA DCS receive site (mapping to verify; zones still deferred)", BOLD)
+put(ws, "A39", "PEAs with a NOAA DCS receive site (zones modeled in analysis.py)", BOLD)
 hdr(ws, 40, ["PEA", "Site", "Population (2020)", "Uplink revenue, PEA", "Share of uplink PEA revenue",
              "Uplink winner"])
 for k_, code in enumerate(["PEA005", "PEA147", "PEA114", "PEA286"]):
@@ -805,11 +805,11 @@ note(ws, "A91", "Packages remove exposure risk, so this table ignores the exposu
      "packages win too cheaply.", "G91", 60)
 
 # ======================================================== Summary
-ws = sheet("Summary", "1675–1695 MHz auction revenue, v0.4", [46, 17, 14, 30, 40])
+ws = sheet("Summary", "1675–1695 MHz auction revenue, v0.5", [46, 17, 14, 30, 40])
 put(ws, "A3", LABEL + ". Not for release.", MARK)
 hdr(ws, 5, ["Measure (before federal coordination, upper bound)", "Gross revenue", "$/MHz-pop", "Scenario",
             "Meaning"])
-inc = SCR(18)
+inc = SCR(12)
 summ = [
     ("Central estimate", "=Scenarios!B47", "=Scenarios!B48", "=Scenarios!B4",
      "Same-frequency evidence: D2D bidders value the band like uplink"),
@@ -820,8 +820,8 @@ summ = [
      f'=INDEX(Scenarios!$B$4:${LASTC}$4,SUMPRODUCT(MAX(({SCR(47)}=B8)*({inc}="Y")*(COLUMN({SCR(47)})-1))))',
      "Needs three D2D bidders at downlink value, high benchmarks"),
     ("Central, if EchoStar also holds the Bidco licenses",
-     f"={B}*{MH}*{POP}*{AV}*MAX(Scenarios!B20,Transactions!B5/(Transactions!C5*{EV['dishall']}*{POP}))",
-     f"=MAX(Scenarios!B20,Transactions!B5/(Transactions!C5*{EV['dishall']}*{POP}))", "S1 variant",
+     f"={B}*{MH}*{POP}*{AV}*MAX(Scenarios!B14,Transactions!B5/(Transactions!C5*{EV['dishall']}*{POP}))",
+     f"=MAX(Scenarios!B14,Transactions!B5/(Transactions!C5*{EV['dishall']}*{POP}))", "S1 variant",
      "Lower EchoStar price per MHz-pop; three D2D bidders"),
     ("Monte Carlo median (illustrative)", f"={MC[12]}", "", "MonteCarlo",
      "Pasted values from the build script; does not update with inputs"),
@@ -835,7 +835,7 @@ for i, (lab, a, b, c, d) in enumerate(summ, 6):
     ws.row_dimensions[i].height = 30
 put(ws, "A11", "What drives the number", BOLD)  # rows 6-10 used above
 put(ws, "A12", '="With two blocks, the third-highest bidder sets the price. With two or fewer D2D bidders, '
-    'carriers set it: "&TEXT(B18,"$0.00,,,""B""")&". A third D2D bidder raises it to "&TEXT(B19,"$0.00,,,""B""")'
+    'terrestrial bidders set it: "&TEXT(B18,"$0.00,,,""B""")&". A third D2D bidder raises it to "&TEXT(B19,"$0.00,,,""B""")'
     '&" at the uplink evidence, or "&TEXT(C19,"$0.00,,,""B""")&" if D2D bidders value the band as downlink."',
     BLACK, wrap=True)
 ws.merge_cells("A12:E12")
@@ -845,17 +845,17 @@ hdr(ws, 15, ["Independent D2D bidders", "D2D at uplink value", "D2D at downlink 
 for k in range(5):
     r = 16 + k
     put(ws, f"A{r}", k, BLACK, fmt=INT)
-    for col, d2dcell in (("B", "Scenarios!$B$23"), ("C", "Scenarios!$C$23")):
-        put(ws, f"{col}{r}", f"={B}*IF(AND($A{r}>={B}+1,{d2dcell}>Scenarios!$B$22),{d2dcell},Scenarios!$B$22)",
+    for col, d2dcell in (("B", "Scenarios!$B$17"), ("C", "Scenarios!$C$17")):
+        put(ws, f"{col}{r}", f"={B}*IF(AND($A{r}>={B}+1,{d2dcell}>Scenarios!$B$16),{d2dcell},Scenarios!$B$16)",
             fmt=USDB)
-put(ws, "A21", "Assumes four carrier or adjacent bidders at the carrier base value.")
+put(ws, "A21", "Assumes three or more terrestrial bidders at the terrestrial uplink base value.")
 hdr(ws, 23, ["Scenario (before federal coordination, upper bound)", "Gross revenue", "In range",
              "Winning class"])
 for j, s in enumerate(SC):
     r, c = 24 + j, get_column_letter(2 + j)
     put(ws, f"A{r}", f"=Scenarios!{c}4")
     put(ws, f"B{r}", f"=Scenarios!{c}47", fmt=USDB)
-    put(ws, f"C{r}", f"=Scenarios!{c}18")
+    put(ws, f"C{r}", f"=Scenarios!{c}12")
     put(ws, f"D{r}", f"=Scenarios!{c}51")
 put(ws, "A34", "Checks status:", BOLD)
 hdr(ws, 37, ["License area (before federal coordination, upper bound)", "Nationwide", "PEA only",
@@ -865,8 +865,8 @@ for k_, r_ in enumerate([82, 83]):
     put(ws, f"B{38 + k_}", f"=License_Area!B{r_}", fmt=USDB)
     put(ws, f"C{38 + k_}", f"=License_Area!C{r_}", fmt=USDB)
     put(ws, f"D{38 + k_}", f"=License_Area!D{r_}", fmt=USDB)
-put(ws, "A35", "Excluded: federal coordination, PEA and regional licenses, 5 MHz blocks, D2D exposure, timing, "
-    "buildout, ODS. S9 is suspended.", wrap=True)
+put(ws, "A35", "Gross bids only. Excluded here: NOAA coordination zones (see analysis.py), REAG licenses, "
+    "2020-2025 MHz, bidding credits, timing, buildout.", wrap=True)
 ws.merge_cells("A35:E35")
 ws.row_dimensions[35].height = 30
 ch = BarChart()
@@ -903,16 +903,15 @@ checks = [
     ("Benchmarks ordered low ≤ base ≤ high for every use case",
      P("SUMPRODUCT((Benchmarks!B5:B8>Benchmarks!C5:C8)+(Benchmarks!C5:C8>Benchmarks!D5:D8))=0"), ""),
     ("Lease-only revenue equals two blocks at the carrier base value",
-     P(f"ROUND(Scenarios!I47-{B}*Scenarios!I22,0)=0"), "Second computation path"),
+     P(f"ROUND(Scenarios!I47-{B}*Scenarios!I16,0)=0"), "Second computation path"),
     ("Bidder-count table never decreases as D2D bidders are added",
      P("AND(SUMPRODUCT((Summary!B17:B20<Summary!B16:B19)*1)=0,SUMPRODUCT((Summary!C17:C20<Summary!C16:C19)*1)=0)"),
      ""),
     ("Bidder-count table at 3 and 2 D2D bidders matches S2 and S3",
      P("AND(ROUND(Summary!C19-Scenarios!C47,0)=0,ROUND(Summary!C18-Scenarios!D47,0)=0)"),
      "Two independent computation paths; needs default multipliers"),
-    ("Every dollar table on Summary and Revenue_Defs carries the upper-bound label",
-     P('AND(COUNTIF(Summary!A3:E37,"*upper bound*")>=5,COUNTIF(Revenue_Defs!A3,"*upper bound*")=1,'
-       'COUNTIF(License_Area!A3:A19,"*upper bound*")>=2)'),
+    ("Every dollar table on Summary and License_Area carries the upper-bound label",
+     P('AND(COUNTIF(Summary!A3:E37,"*upper bound*")>=5,COUNTIF(License_Area!A3:A19,"*upper bound*")>=2)'),
      "Fails if a table header loses the label"),
     ("PEA 2020 population sums to the U.S. 2020 Census total",
      P(f"ROUND(SUM(PEA!D5:D{4 + len(PEAS) + 1})-{INP['pop']},0)=0"), "Fails if scaling or the AK/HI row is wrong"),
@@ -942,8 +941,10 @@ checks = [
     ("Holdings-share net of resold licenses is no larger than gross 2015 share",
      P(f"{EV['dish']}<=Evidence!$B$19+Evidence!$B$20"), "Resold licenses can only reduce holdings"),
     ("Transaction terms verified in primary filings",
-     '=IF(COUNTIF(Transactions!H5:H8,"PENDING")=0,"PASS","PENDING")', ""),
-    ("FNPRM inputs cited to adopted paragraphs", '=IF(COUNTIF(FNPRM!D5:D13,"PENDING")=0,"PASS","PENDING")', ""),
+     '=IF(COUNTIF(Transactions!H5:H10,"PENDING")=0,"PASS","PENDING")', ""),
+    ("FNPRM inputs cited to adopted paragraphs", '=IF(COUNTIF(FNPRM!D5:D15,"PENDING")=0,"PASS","PENDING")', ""),
+    ("Downlink benchmarks ordered: 1670-1675 lease ≤ average ≤ Qualcomm 700 MHz",
+     P("AND(Benchmarks!B5<=Benchmarks!C5,Benchmarks!C5<=Benchmarks!D5)"), "Two comparables"),
 ]
 for i, (lab, fml, d) in enumerate(checks, 5):
     put(ws, f"A{i}", lab, wrap=True)
@@ -953,11 +954,11 @@ last = 4 + len(checks)
 guards = [
     ("Every winner's value ≥ the price it pays", f'=IF(COUNTIF({SCR(52)},FALSE)=0,"OK","CHECK")',
      "Holds by construction unless a reserve price is set"),
-    ("Expected outcome: S4 equals S3 (demand reduction; SpaceX bids for one block)",
+    ("Expected outcome: S4 equals S3 (demand reduction; the lead D2D bidder bids for one block)",
      '=IF(ROUND(Scenarios!E47-Scenarios!D47,0)=0,"OK","CHANGED")',
      "Not a correctness test: shows CHANGED if inputs make two blocks worth bidding for"),
-    ("Coordination placeholder is 100% (deferred)", '=IF(Coordination!B5=1,"OK","CHANGED")',
-     "Shows CHANGED once zones are added"),
+    ("Headline is before coordination (availability 100%)", '=IF(Coordination!B5=1,"OK","CHANGED")',
+     "Zone results are in analysis.py"),
 ]
 hdr(ws, last + 4, ["Logic guards and expected outcomes (not tests)", "Status", "Note"])
 for k, (lab, fml, d) in enumerate(guards, last + 5):
@@ -971,33 +972,25 @@ wb["Summary"]["B34"] = f"=Checks!B{last + 2}"
 wb["Summary"]["B34"].font = GREEN
 
 # ======================================================== README
-ws = sheet("README", "1675–1695 MHz auction valuation workbook, v0.4", [120])
+ws = sheet("README", "1675–1695 MHz auction valuation workbook, v0.5", [120])
 lines = [
-    ("What changed in v0.4", BOLD),
-    ("• License_Area rows 72–91: PEA licenses plus all-or-nothing nationwide package bids, with core pricing.",
+    ("What changed in v0.5", BOLD),
+    ("• Bidders are counts by class (D2D, terrestrial), not a named list. Base case: three D2D, four terrestrial.",
      None),
+    ("• Terrestrial downlink restored with two unpaired-downlink comparables: Qualcomm 700 MHz D and E Blocks "
+     "(FCC 11-188) and the 1670-1675 MHz lease, capitalized.", None),
+    ("• FNPRM tab cites the adopted FNPRM (FCC 26-70) by paragraph. Gross revenue only (Revenue_Defs removed).",
+     None),
+    ("• Zones, bidder-count grid, backtest, sharing calibration, and sensitivities: scripts/analysis.py.", None),
     ("", None),
-    ("What changed in v0.3", BOLD),
-    ("• License_Area and PEA tabs: nationwide vs PEA licensing for UE uplink and D2D downlink, using the FCC "
-     "Auction 110 PEA file, a market-size curve fitted to Auction 97 B1 prices, and a national-portfolio "
-     "premium measured from the EchoStar sale.", None),
-    ("", None),
-    ("What changed from v0.1", BOLD),
-    ("• Raw per-license data for Auction 97 (1,614 licenses) and Auction 113 (200 licenses); every benchmark is "
-     "now a formula on that data.", None),
-    ("• Bidders: added AST SpaceMobile and Ligado. Demand reduction for SpaceX. Lease-only SCS scenario.", None),
-    ("• D2D base use case is uplink (same-frequency evidence); downlink is the upside.", None),
-    ("• TDL formula corrected; carriers-downlink scenario suspended.", None),
-    ("• Checks rebuilt so each can fail. Monte Carlo added (illustrative).", None),
+    ("What changed in v0.4 and earlier", BOLD),
+    ("• v0.4: PEA licenses plus all-or-nothing nationwide package bids. v0.3: nationwide vs PEA licensing. "
+     "v0.2: raw per-license FCC data for Auctions 97 and 113.", None),
     ("", None),
     ("Population basis", BOLD),
-    ("Benchmarks use each auction's own population basis; values apply them to the 2020 Census population. "
-     "The matched-pair test (Evidence) found 2026 $/pop within about 1% of 2015 $/pop for the same licenses, "
-     "which supports this.", None),
-    ("", None),
-    ("Still not in v0.2", BOLD),
-    ("• Federal coordination zones (deferred, 100%). • PEA and regional licenses. • 5 MHz band plan. "
-     "• Primary filings for transaction terms. • Adopted FNPRM paragraph numbers.", None),
+    ("Benchmarks use each source's own population basis; values apply them to the 2020 Census population. "
+     "The matched-pair test (Evidence) found 2026 $/pop within about 1% of 2015 $/pop for the same licenses.",
+     None),
     ("", None),
     ("Every dollar figure in this workbook is: " + LABEL + ".", MARK),
     ("", None),
@@ -1010,7 +1003,7 @@ for i, (t, fnt) in enumerate(lines, 4):
 
 order_tabs = ["Summary", "README", "Scenarios", "License_Area", "PEA", "Bidders", "Benchmarks", "Evidence",
               "Transactions",
-              "MonteCarlo", "Inputs", "Revenue_Defs", "FNPRM", "Coordination", "Checks", "Raw_A97", "Raw_A113"]
+              "MonteCarlo", "Inputs", "FNPRM", "Coordination", "Checks", "Raw_A97", "Raw_A113"]
 wb._sheets = [wb[n] for n in order_tabs]
 wb.active = 0
 wb.calculation.fullCalcOnLoad = True  # Excel and LibreOffice compute every formula on open

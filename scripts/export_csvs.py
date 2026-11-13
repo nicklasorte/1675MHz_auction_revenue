@@ -22,7 +22,7 @@ PEAS = list(csv.DictReader(open(PEA_FILE, encoding="utf-8-sig")))
 WB = load_workbook(XLSX, data_only=True)
 
 ECHOSTAR_SELLERS = ("Northstar Wireless, LLC", "SNR Wireless LicenseCo, LLC")
-NOAA_PEAS = {"PEA005": "Suitland, MD", "PEA147": "Wallops Island, VA (Delmarva)",
+NOAA_PEAS = {"PEA005": "Suitland, MD", "PEA147": "Wallops, VA",  # counties checked in FCC DA 14-759 App. B
              "PEA114": "Fairmont, WV", "PEA286": "Sioux Falls, SD"}
 written = []
 
@@ -120,7 +120,7 @@ for i in range(5, 5 + len(PEAS) + 1):
     rows.append([code, pea_ws[f"B{i}"].value, pea_ws[f"C{i}"].value, pea_ws[f"D{i}"].value,
                  NOAA_PEAS.get(code, "")])
 write("pea_populations.csv",
-      ["pea", "name", "population_2010", "population_2020_scaled", "noaa_dcs_site_to_verify"], rows)
+      ["pea", "name", "population_2010", "population_2020_scaled", "noaa_dcs_site"], rows)
 
 # ------------------------------------------------------------------ Inputs typed into the workbook
 ws = WB["Inputs"]
@@ -129,14 +129,14 @@ rows = [[ws[f"A{r}"].value, ws[f"B{r}"].value, ws[f"C{r}"].value]
 write("inputs.csv", ["input", "value", "source_or_note"], rows)
 
 ws = WB["Transactions"]
-rows = [[ws[f"{c}{r}"].value for c in "ABCDEFGH"] for r in range(5, 9)]
+rows = [[ws[f"{c}{r}"].value for c in "ABCDEFGH"] for r in range(5, 11)]
 write("transactions.csv",
       ["transaction", "price_usd", "mhz", "population_share_covered", "usd_per_mhz_pop", "payment",
        "source_and_caveats", "primary_source_verified"], rows)
 
 ws = WB["Bidders"]
-rows = [[ws[f"{c}{r}"].value for c in "ABCD"] for r in range(5, 13)]
-write("bidders.csv", ["bidder", "class", "value_multiplier", "why_credible"], rows)
+rows = [[ws[f"{c}{r}"].value for c in "ABC"] for r in range(5, 7)]
+write("bidder_classes.csv", ["bidder_class", "value_multiplier", "meaning"], rows)
 
 # ------------------------------------------------------------------ Calculated results
 ws = WB["Evidence"]
@@ -150,22 +150,16 @@ write("benchmarks.csv", ["use_case", "low_usd_per_mhz_pop", "base_usd_per_mhz_po
                          "basis"], rows)
 
 ws = WB["Scenarios"]
-fields = [(4, "scenario"), (5, "description"), (6, "benchmark_case"), (7, "carrier_use_case"),
-          (8, "d2d_use_case"), (9, "spacex"), (10, "amazon_leo"), (11, "ast_spacemobile"),
-          (12, "carrier_d2d_jv"), (13, "att"), (14, "verizon"), (15, "tmobile"), (16, "ligado"),
-          (17, "spacex_wants_both_blocks"), (18, "in_summary_range"),
-          (20, "carrier_usd_per_mhz_pop"), (21, "d2d_usd_per_mhz_pop"), (22, "carrier_value_per_block_usd"),
-          (23, "d2d_value_per_block_usd"), (44, "spacex_bids_for_two"), (45, "clearing_price_per_block_usd"),
+fields = [(4, "scenario"), (5, "description"), (6, "benchmark_case"), (7, "terrestrial_use_case"),
+          (8, "d2d_use_case"), (9, "d2d_bidders"), (10, "terrestrial_bidders"),
+          (11, "lead_d2d_wants_both_blocks"), (12, "in_summary_range"),
+          (14, "terrestrial_usd_per_mhz_pop"), (15, "d2d_usd_per_mhz_pop"), (16, "terrestrial_value_per_block_usd"),
+          (17, "d2d_value_per_block_usd"), (41, "lead_bids_for_two"), (45, "clearing_price_per_block_usd"),
           (46, "blocks_sold"), (47, "gross_revenue_usd"), (48, "implied_usd_per_mhz_pop"),
           (50, "blocks_won_by_d2d"), (51, "winning_class")]
 rows = [[ws[f"{chr(66 + j)}{r}"].value for r, _ in fields] for j in range(9)]
 write("scenarios.csv", [f for _, f in fields], rows)
 
-ws = WB["Revenue_Defs"]
-rows = [[WB["Scenarios"][f"{chr(66 + j)}4"].value, ws[f"{chr(66 + j)}5"].value, ws[f"{chr(66 + j)}6"].value,
-         ws[f"{chr(66 + j)}9"].value, ws[f"{chr(66 + j)}7"].value] for j in range(9)]
-write("revenue_definitions.csv", ["scenario", "gross_bids_usd", "net_bids_auction113_credit_rate_usd",
-                                  "net_bids_auction97_credit_rate_usd", "net_of_noaa_costs_usd"], rows)
 
 rows = []
 for i in range(5, 5 + len(PEAS) + 1):

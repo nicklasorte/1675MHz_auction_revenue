@@ -1,9 +1,9 @@
 item,value,note
-Carrier value: TUL base × lognormal,0.521993361080741,"AT&T, Verizon, T-Mobile, Ligado"
+Terrestrial value: TUL base × lognormal,0.521993361080741,Four terrestrial bidders
 Carrier spread (σ of log price relative to auction average),0.237763975890283,From Auction 97 paired prices of winners that spent over $1B
-"D2D value: uniform, low end ($/MHz-pop)",0.345706693820914,SpaceX's Auction 113 B1 price
+"D2D value: uniform, low end ($/MHz-pop)",0.345706693820914,Three D2D bidders; low end is SpaceX's Auction 113 B1 price
 "D2D value: uniform, high end ($/MHz-pop)",0.775813591651319,Grain prior market price
-Draws,10000,SpaceX bids for one block (demand reduction).
+Draws,10000,Each bidder bids for one block (demand reduction). Bidder-count sweep in analysis.py.
 "Gross revenue, 10th percentile ($)",3333890131.68092,"Before federal coordination, upper bound"
 "Gross revenue, median ($)",3894133970.44561,"Before federal coordination, upper bound"
 "Gross revenue, 90th percentile ($)",4501637362.08329,"Before federal coordination, upper bound"

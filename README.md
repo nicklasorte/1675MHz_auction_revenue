@@ -1,100 +1,92 @@
 # 1675–1695 MHz auction revenue
 
-This repository estimates FCC auction revenue for 20 megahertz at 1675–1695 MHz under the
-Further Notice of Proposed Rulemaking (FNPRM) in WT Docket No. 26-284. It compares nationwide
-licenses, Partial Economic Area (PEA) licenses, and PEA licenses with nationwide package bids, for
-terrestrial UE uplink and direct-to-device (D2D) use.
+**DRAFT//PRE-DECISIONAL.** This repository estimates FCC auction revenue (gross bids) for the two
+unpaired 10-megahertz blocks at 1675–1695 MHz proposed in the Further Notice of Proposed Rulemaking
+(FNPRM), FCC 26-70, WT Docket No. 26-284. It compares nationwide licenses, Partial Economic Area (PEA)
+licenses, and PEA licenses with nationwide package bids, and models the coordination zones around the
+four NOAA Data Collection System receive sites. The 2020–2025 MHz block in the same proposal is out of
+scope.
 
-Every revenue figure here is **before federal coordination and an upper bound**: coordination
-zones around the four NOAA Data Collection System receive sites aren't modeled yet.
+Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (v0.5, 11 figures).
 
-## Results (workbook v0.4, November 10, 2026)
+## Results (v0.5, November 13, 2026)
 
-Gross bids for two unpaired 10-megahertz blocks, with SpaceX, Amazon Leo, and AST SpaceMobile as
-D2D bidders and AT&T, Verizon, T-Mobile, and Ligado as terrestrial bidders.
+| Measure | Gross bids |
+|---|---|
+| Central estimate, before coordination (3 D2D and 4 terrestrial bidders) | $4.07B |
+| Simulated 10th to 90th percentile, before coordination | $3.33B–$4.50B |
+| Central estimate with NOAA zones at half / full NTIA distances | $3.80B / $3.30B |
+| Two or fewer D2D bidders, or SCS leased instead of bid | $3.46B |
+| FCC's own estimate for the same 20 MHz (FNPRM App. C method) | $17.0B |
 
-| Case | Nationwide | PEA only | PEA + packages |
+| License design, before coordination | Nationwide | PEA only | PEA + packages |
 |---|---|---|---|
 | UE uplink | $4.07B | $4.65B | $4.65B |
 | D2D downlink | $5.14B | $5.21B | $5.21B |
 
-With two or fewer independent D2D bidders, or if D2D operators lease supplemental coverage from
-space (SCS) rights instead of bidding, revenue is about $3.46B. See
-[`docs/license-design-memo.md`](docs/license-design-memo.md) for the decision memo and
-[`docs/1675-auction-valuation-plan.md`](docs/1675-auction-valuation-plan.md) for the full method
-and sensitivities.
+The FCC's estimate is higher mainly because it applies the Auction 113 average price, which is 98%
+paired spectrum; unpaired spectrum next door sold for one-fifth as much. PEA licenses with package
+bids match or beat the other designs in every case tested, including with zones, if at least three
+D2D bidders compete.
 
-[`docs/next-phase-plan.md`](docs/next-phase-plan.md) plans the next round of analysis, and
-[`docs/literature-review.md`](docs/literature-review.md) reviews the related work. The working paper, [`docs/working-paper.md`](docs/working-paper.md), writes up the evidence, method,
-and results with five figures. Every dataset behind the calculation is in [`data/csv/`](data/csv/),
-and every figure and the code that makes it are in [`figures/`](figures/) and
-[`scripts/make_figures.py`](scripts/make_figures.py).
+## Documents
+
+| Document | What it is |
+|---|---|
+| [`docs/working-paper.md`](docs/working-paper.md) | Evidence, method, results, zones, limitations, numbers ledger, figures |
+| [`docs/dataviz-plan.md`](docs/dataviz-plan.md) | Ten ways to show the results, and which are built |
+| [`docs/literature-review.md`](docs/literature-review.md) | Related work on valuation, auctions, sharing, and SCS |
+| [`docs/next-phase-plan.md`](docs/next-phase-plan.md) | The plan this version carries out, with status |
+| [`docs/license-design-memo.md`](docs/license-design-memo.md) | One-page decision memo (v0.4 copy) |
+| [`docs/1675-auction-valuation-plan.md`](docs/1675-auction-valuation-plan.md), [`docs/1675-auction-redteam.md`](docs/1675-auction-redteam.md) | Original plan and red-team review |
 
 ## Reproduce the analysis
 
-Requirements: Python 3.10 or later, `openpyxl` (`pip install -r requirements.txt`), `pdftotext`
-(poppler-utils), and LibreOffice for recalculation.
+Requirements: Python 3.10 or later (`pip install -r requirements.txt`: openpyxl, matplotlib, numpy,
+pyshp), `pdftotext` (poppler-utils), and LibreOffice.
 
 ```bash
 ./reproduce.sh
 ```
 
-The script runs eight steps:
+The script:
 
-0. Downloads any missing FCC source file and checks it against its SHA-256 (`scripts/download_raw.py`).
-1. Extracts the Auction 97 tables from the FCC public notices with `pdftotext`.
-2. Parses per-license results for Auctions 97 and 113 (`scripts/parse_auctions.py`).
-3. Builds the workbook with live formulas (`scripts/build_workbook.py`).
-4. Recalculates every formula in headless LibreOffice (`scripts/recalc.py`).
-5. Verifies the `Checks` tab and the headline numbers (`scripts/verify.py`).
-6. Exports every dataset used in the calculation to `data/csv/` and checks the files against the
-   published FCC totals and the workbook (`scripts/export_csvs.py`, `scripts/check_csvs.py`).
+1. Downloads any missing source file and checks its SHA-256 (`scripts/download_raw.py`).
+2. Extracts the FCC tables with `pdftotext` and parses Auctions 97 and 113 (`scripts/parse_auctions.py`)
+   and the PEA, county, protection-zone, and NTIA tables (`scripts/parse_geo.py`).
+3. Builds the workbook with live formulas (`scripts/build_workbook.py`), recalculates it in
+   LibreOffice (`scripts/recalc.py`), and verifies the `Checks` tab and headline numbers
+   (`scripts/verify.py`).
+4. Exports every dataset to `data/csv/` and ties it to the published FCC totals and the workbook
+   (`scripts/export_csvs.py`, `scripts/check_csvs.py`).
+5. Runs the independent Python model and the analyses: bidder counts, NOAA zones, AWS-3 zone
+   calibration, backtest, stress tests, tornado, and the FCC comparison (`scripts/analysis.py`). It
+   stops if the Python model doesn't reproduce the workbook.
+6. Rebuilds all figures from `data/csv/` (`scripts/make_figures.py`); reruns write identical files.
 
-7. Rebuilds the working-paper figures from those CSVs (`scripts/make_figures.py`, needs `matplotlib`
-   and `numpy`). Figure files are deterministic: a rerun writes identical bytes.
-
-A clean run reproduces `outputs/1675-auction-valuation-v0.4.xlsx` exactly: all 35,402 non-empty
-cells match, and the parsed CSVs are byte-identical to the originals. The run prints PASS, with two
-checks PENDING until the transaction terms and FNPRM paragraph citations are verified.
+The run prints PASS, with one check PENDING until the remaining transaction terms are verified in
+primary filings.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
 | `reproduce.sh` | One-command rebuild |
-| `scripts/` | Download, parser, workbook builder, recalculation, verification, CSV export, and figures |
-| `data/raw/` | Unedited FCC source files (public notices and FCC Public Reporting System downloads) |
-| `data/SOURCES.md` | Source URL and SHA-256 checksum for every raw file, plus the typed-in inputs |
-| `data/processed/` | Per-license CSVs produced by `parse_auctions.py` |
-| `data/csv/` | Every dataset used in the calculation, filtered and exported as CSV, plus all Monte Carlo draws (see `data/csv/README.md`) |
-| `figures/` | Working-paper figures as PNG, SVG, and PDF |
-| `outputs/` | Current workbook (v0.4); earlier versions in `outputs/archive/` |
-| `docs/` | Working paper, literature review, next-phase plan, valuation plan, red-team review, and the decision memo |
-
-## How the model works
-
-- **Benchmarks** come from the raw per-license data: Auction 97 unpaired 1695–1710 MHz prices for
-  terrestrial uplink, the SpaceX/EchoStar purchase of those licenses for satellite uplink, and the
-  Grain 800 MHz prices for D2D downlink.
-- **Pricing:** with two blocks, the uniform clock price stops at the highest losing bid. SpaceX
-  can bid for both blocks only if that leaves it more surplus (demand reduction).
-- **PEA licensing:** carrier values by PEA follow a market-size curve fitted to Auction 97 B1
-  prices (slope 0.65 on log population). D2D bidders lose the 1.21 national-portfolio premium
-  measured from the EchoStar sale.
-- **Package bids:** a nationwide package wins only if it beats the sum of the per-PEA bids for its
-  block, and pays at least that sum.
-- **Monte Carlo:** an illustrative simulation with a fixed seed (1675), computed in the build
-  script and pasted into the workbook as values.
+| `scripts/` | Download, parsers, workbook builder, recalculation, verification, export, analyses, figures |
+| `data/raw/` | Unedited source files (FCC, NTIA, Census Bureau, eCFR) |
+| `data/SOURCES.md` | Source URL and SHA-256 for every raw file, plus typed-in inputs |
+| `data/processed/` | Parsed tables |
+| `data/csv/` | Every dataset used, and every analysis result (see `data/csv/README.md`) |
+| `figures/` | Figures as PNG, SVG, and PDF |
+| `outputs/` | Current workbook (v0.5); earlier versions in `outputs/archive/` |
+| `docs/` | Working paper and supporting documents |
 
 ## Status and caveats
 
-- Draft, pre-decisional analysis prepared with AI assistance. It needs human review by someone with
-  auction experience before any figure is used.
-- Federal coordination zones, the 5-megahertz band plan, and regional licenses aren't modeled.
-- Transaction terms come from press releases and reports, not primary filings.
-- FNPRM details come from Covington's summary of the October 8 draft, not the adopted text.
-- The bidder list hasn't been signed off. Adding or dropping one D2D bidder moves the central
-  estimate by about $0.6B.
-
-`docs/1675-auction-redteam.md` records the red-team review of v0.1. Version 0.2 fixed its
-main findings; the plan's red-team section lists what's still open.
+- Draft, pre-decisional analysis prepared with AI assistance. It needs review by someone with
+  auction experience before any figure is used, and NOAA-related statements need IRAC coordination.
+- Zone sizes use NTIA's coordination distances, which NTIA calls conservative, and half those
+  distances. The cost of a zone is calibrated on 19 AWS-3 markets.
+- Except the Qualcomm 700 MHz sale (FCC 11-188), transaction terms come from releases and press reports.
+- Bidders are modeled as counts by class, not named firms.
+- The decision memo is still the v0.4 copy and names bidders; it needs a refresh to match v0.5.

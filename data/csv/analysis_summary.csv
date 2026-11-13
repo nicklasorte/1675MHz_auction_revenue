@@ -1,0 +1,20 @@
+measure,value
+python_model_max_abs_diff_usd,2.86102294921875e-05
+ntia_reference_mean_abs_error_pct,0.096
+ntia_reference_majority_agreement,25/25
+zone_ntia_national_share,0.2952079865582917
+aws3_zone_coef,-1.029447867859464
+aws3_zone_se,0.23854312026267918
+aws3_zone_retained,0.35720413001325735
+aws3_zone_retained_95ci,"(0.2238022602862272, 0.5701228858696216)"
+aws3_n,172
+aws3_n_encumbered,19
+aws3_robust_drop_dc,-1.1964420617825269
+aws3_robust_drop_largest,-1.032453532613977
+aws3_robust_indicator,-0.6756275501014639
+backtest_flat_median_abs_err,4.013737297802923
+backtest_median_abs_err,0.49298056433391885
+backtest_agg_err,0.002330696959112477
+qualcomm_pmp,0.8422294994584495
+lease_pmp,0.1203024904698611
+a113_avg,2.5271398695265055

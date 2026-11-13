@@ -6,6 +6,7 @@ Without --force, files already present are only checked, not downloaded again. A
 means the FCC changed the file after November 10, 2026; the script reports it and exits non-zero.
 """
 import argparse
+import gzip
 import hashlib
 import sys
 import urllib.request
@@ -33,6 +34,35 @@ FILES = [
     ("fcc_pea/a110_market.csv",
      "https://auctiondata.fcc.gov/public/projects/auction110/reports/market/download",
      "87a5079f3b12c88aadda43fc63f6d5ac5433f19b6a3045aefc7c7d3ef57473ec"),
+    # v0.5 additions
+    ("fcc_fnprm/FCC-26-70A1.pdf", "https://docs.fcc.gov/public/attachments/FCC-26-70A1.pdf",
+     "b700b70af11ff45bd5e353c4e100efdee53e373f45ba0831b40ca7dc63e952b0"),
+    ("fcc_pea/DA-14-759A1.pdf", "https://docs.fcc.gov/public/attachments/DA-14-759A1.pdf",
+     "5c95713ad59d1f938a0c2817224cdbb870d4433d5b2a790476081920c5109c9b"),
+    ("fcc_pea/DA-14-759A2.pdf", "https://docs.fcc.gov/public/attachments/DA-14-759A2.pdf",
+     "d3303518e88e3798d1beffd5246c03467d6e01244cd35f550e3d961c30f29f2a"),
+    ("fcc_pea/DA-14-759A3.pdf", "https://docs.fcc.gov/public/attachments/DA-14-759A3.pdf",
+     "3e28df61c669dbff4a71e0e852a5c93d3785de228132bc733afed47472c07bef"),
+    ("fcc_transactions/FCC-11-188A1.pdf", "https://docs.fcc.gov/public/attachments/FCC-11-188A1.pdf",
+     "9466a5dd055a0464e0b891b0377359c5c76f31e12d71209bef2bf8398b37f57f"),
+    ("fcc_transactions/FCC-07-16A1.pdf", "https://docs.fcc.gov/public/attachments/FCC-07-16A1.pdf",
+     "bb75c15e85c8da3eb882566aff301b50394473e98b43c5bdaf0fb1ac35e9a403"),
+    ("ntia/1675-mhz-identification-letter.pdf",
+     "https://www.ntia.gov/sites/default/files/2026-03/1675-mhz-identification-letter.pdf",
+     "af07659bbe44bd7a9356171cbf0da5bbc90359ebf39fd4adeb31e66cd5f85f18"),
+    ("ntia/ntia_report_24-01_spres_fo.pdf",
+     "https://www.ntia.gov/sites/default/files/2025-10/ntia_report_24-01_12-2024-1675mhz-rev3-ntia-spres-fo.pdf",
+     "8230cc382e8753461ef8d0ad979285e40574b406d8bc973c7af5ee17b54dee5d"),
+    ("census/CenPop2020_Mean_CO.txt",
+     "https://www2.census.gov/geo/docs/reference/cenpop2020/county/CenPop2020_Mean_CO.txt",
+     "4f754a3bda9714e5820d73bfac44ef1dab2b8c371f6c136305474cda7a752014"),
+    ("census/cb_2020_us_county_20m.zip", "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_20m.zip",
+     "9394913edbd6f72791b06b84509e59ea2d275d10b73ae27ef87df3bdb061890c"),
+    ("census/cb_2020_us_state_20m.zip", "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_state_20m.zip",
+     "1d872779cbfa2c2bf828850664aa9593a35844205e2e4bed5aeb78affb8da050"),
+    ("ecfr/title47_section2.106_2026-11-01.xml",
+     "https://www.ecfr.gov/api/versioner/v1/full/2026-11-01/title-47.xml?part=2&section=2.106",
+     "660ecc8861147243c3fce116b5ab706976ef304f41c1ecc01497c864f6ceb33e"),
 ]
 
 
@@ -51,9 +81,13 @@ def main():
         path.parent.mkdir(parents=True, exist_ok=True)
         action = "kept"
         if args.force or not path.exists():
-            req = urllib.request.Request(url, headers={"User-Agent": "1675MHz_auction_revenue reproduction"})
-            with urllib.request.urlopen(req, timeout=120) as r:
-                path.write_bytes(r.read())
+            req = urllib.request.Request(url, headers={"User-Agent": "1675MHz_auction_revenue reproduction",
+                                                       "Accept-Encoding": "gzip"})  # eCFR requires compression
+            with urllib.request.urlopen(req, timeout=180) as r:
+                body = r.read()
+                if r.headers.get("Content-Encoding") == "gzip":
+                    body = gzip.decompress(body)
+                path.write_bytes(body)
             action = "downloaded"
         got = sha256(path)
         match = got == want
