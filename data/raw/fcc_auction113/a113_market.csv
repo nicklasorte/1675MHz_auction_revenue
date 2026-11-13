@@ -1,0 +1,200 @@
+﻿auction_id,market,market_name,population,small_market_indicator
+113,BEA005, Albany-Schenectady-Troy NY ,1243765,N
+113,BEA010, NYC-Long Is. NY-NJ-CT-PA-MA-VT ,28020320,N
+113,BEA016, Staunton VA-WV ,372005,Y
+113,BEA017, Roanoke VA-NC-WV ,895482,N
+113,BEA018, Greensboro-Winston-Salem NC-VA ,2137567,N
+113,BEA020, Norfolk-Virginia Beach VA-NC ,1913002,N
+113,BEA021, Greenville NC ,928729,N
+113,BEA023, Charlotte-Gastonia NC-SC ,2956736,N
+113,BEA026, Charleston-North Charleston SC ,838240,N
+113,BEA027, Augusta-Aiken GA-SC ,694986,N
+113,BEA033, Sarasota-Bradenton FL ,1054539,N
+113,BEA039, Columbus GA-AL ,585205,N
+113,BEA046, Hickory-Morganton NC-TN ,559644,N
+113,BEA049, Cincinnati-Hamilton OH-KY-IN ,2431541,N
+113,BEA052, Wheeling WV-OH ,292556,Y
+113,BEA054, Erie PA ,488069,Y
+113,BEA058, Northern Michigan MI ,259502,Y
+113,BEA061, Traverse City MI ,314675,Y
+113,BEA064, Chicago-Gary-Kenosha IL-IN-WI ,10885072,N
+113,BEA065, Elkhart-Goshen IN-MI ,969949,N
+113,BEA066, Fort Wayne IN ,775649,N
+113,BEA079, Montgomery AL ,508631,N
+113,BEA086, Lake Charles LA ,569377,N
+113,BEA087, Beaumont-Port Arthur TX ,462560,Y
+113,BEA089, Monroe LA ,337203,Y
+113,BEA095, Jonesboro AR-MO ,313900,Y
+113,BEA097, Springfield IL-MO ,504372,N
+113,BEA102, Davenport-Moline IA-IL ,559052,N
+113,BEA104, Madison WI-IL-IA ,1100867,N
+113,BEA105, La Crosse WI-MN ,268520,Y
+113,BEA106, Rochester MN-IA-WI ,358885,Y
+113,BEA110, Grand Forks ND-MN ,222816,Y
+113,BEA112, Bismarck ND-MT-SD ,219496,Y
+113,BEA113, Fargo-Moorhead ND-MN ,446037,Y
+113,BEA123, Topeka KS ,477563,Y
+113,BEA133, McAllen-Edinburg-Mission TX ,1377882,N
+113,BEA135, Odessa-Midland TX ,490403,Y
+113,BEA137, Lubbock TX ,426060,Y
+113,BEA143, Casper WY-ID-UT ,477353,Y
+113,BEA144, Billings MT-WY ,505999,N
+113,BEA145, Great Falls MT ,168176,Y
+113,BEA148, Idaho Falls ID-WY ,414618,Y
+113,BEA149, Twin Falls ID ,206625,Y
+113,BEA168, Pendleton OR-WA ,219731,Y
+113,BEA169, Richland-Kennewick-Pasco WA ,888539,N
+113,BEA172, Honolulu HI ,1455271,N
+113,BEA173, Guam-Northern Mariana Islands ,201165,Y
+113,CMA003," Chicago, IL ",8445866,N
+113,CMA006," Boston-Brockton-Lowell, MA-NH ",4810743,N
+113,CMA013," Pittsburgh, PA ",1982805,N
+113,CMA022," Tampa-St. Petersburg, FL ",2980760,N
+113,CMA032," Hartford-Bristol, CT ",1213531,N
+113,CMA034," Rochester, NY ",1065361,N
+113,CMA038," Providence-Warwick, RI ",1011736,N
+113,CMA042, Bridgeport-Stamford-Danbury CT ,957419,N
+113,CMA048," Toledo, OH-MI ",801413,N
+113,CMA049, New Haven-Waterbury-Meriden CT ,864835,N
+113,CMA055," Worchester-Leominster, MA ",862111,N
+113,CMA056," Northeast Pennsylvania, PA ",709817,N
+113,CMA061," Charlotte-Gastonia, NC ",1581692,N
+113,CMA063," Springfield-Holyoke, MA ",628133,N
+113,CMA066," Youngstown-Warren, OH ",430591,Y
+113,CMA067," Greenville-Spartanburg, SC ",984935,N
+113,CMA069," Wilmington, DE-NJ-MD ",739281,N
+113,CMA074," Fresno, CA ",1008654,N
+113,CMA076," New Bedford-Fall River, MA ",579200,N
+113,CMA080," Baton Rouge, LA ",752762,N
+113,CMA081," El Paso, TX ",865657,N
+113,CMA083," Mobile, AL ",646576,N
+113,CMA085," Johnson City-Kingsport, TN-VA ",514899,N
+113,CMA087," Canton, OH ",401574,Y
+113,CMA088," Chattanooga, TN-GA ",562647,N
+113,CMA090," Charleston, SC ",799636,N
+113,CMA103," Peoria, IL ",351640,Y
+113,CMA105," Lancaster, PA ",552984,N
+113,CMA110," Huntington-Ashland, WV-KY-OH ",302422,Y
+113,CMA115," Utica-Rome, NY ",292264,Y
+113,CMA117," Colorado Springs, CO ",755105,N
+113,CMA118," Reading, PA ",428849,Y
+113,CMA119," Evansville, IN-KY ",347060,Y
+113,CMA120," Huntsville, AL ",589335,N
+113,CMA122," Binghamton, NY ",285572,Y
+113,CMA123," Santa Rosa-Petaluma, CA ",488863,Y
+113,CMA125," Appleton-Oskosh-Neenah, WI ",414877,Y
+113,CMA134," Atlantic City, NJ ",369797,Y
+113,CMA136," Lorain-Elyria, OH ",312964,Y
+113,CMA143," Johnstown, PA ",207601,Y
+113,CMA150," Visalia-Tulare-Porterville, CA ",473117,Y
+113,CMA154," New London-Norwich, CT ",268555,Y
+113,CMA159," Provo-Orem, UT ",659399,N
+113,CMA164," Fort Myers, FL ",760822,N
+113,CMA172," Lincoln, NE ",322608,Y
+113,CMA180," Springfield, OH ",174715,Y
+113,CMA184," Houma-Thibodaux, LA ",207137,Y
+113,CMA188," Amarillo, TX ",259278,Y
+113,CMA194," Waco, TX ",260579,Y
+113,CMA215," Chico, CA ",211632,Y
+113,CMA220," Abilene, TX ",176579,Y
+113,CMA225," Altoona, PA ",122822,Y
+113,CMA226," Florence, AL ",150791,Y
+113,CMA227," Anderson, SC ",203718,Y
+113,CMA228," Vineland-Millville, NJ ",154152,Y
+113,CMA231," Mansfield, OH ",124936,Y
+113,CMA234," Athens, GA ",276497,Y
+113,CMA238," Sharon, PA ",110652,Y
+113,CMA240," Texarkana, AR-TX ",147519,Y
+113,CMA254," Redding, CA ",182155,Y
+113,CMA270," Bellingham, WA ",226847,Y
+113,CMA272," Gadsden, AL ",103436,Y
+113,CMA277," Sheboygan, WI ",118034,Y
+113,CMA284," Elmira, NY ",84148,Y
+113,CMA287," Bryan-College Station, TX ",233849,Y
+113,CMA292," Sherman-Denison, TX ",135543,Y
+113,CMA293," Owensboro, KY ",103312,Y
+113,CMA306, Gulf of America ,0,Y
+113,CMA307, Alabama 1 - Franklin ,388488,Y
+113,CMA308, Alabama 2 - Jackson ,149158,Y
+113,CMA311, Alabama 5 - Cleburne ,219878,Y
+113,CMA313, Alabama 7 - Butler ,182948,Y
+113,CMA321, Arizona 4 - Yuma ,220438,Y
+113,CMA339, California 4 - Madera ,501666,N
+113,CMA340, California 5 - San Luis Obispo ,282424,Y
+113,CMA342, California 7 - Imperial ,179702,Y
+113,CMA343, California 8 - Tehama ,116585,Y
+113,CMA345, California 10 - Sierra ,105477,Y
+113,CMA347, California 12 - Kings ,152486,Y
+113,CMA353, Colorado 6 - San Miguel ,98252,Y
+113,CMA358, Connecticut 2 - Windham ,116418,Y
+113,CMA360, Florida 1 - Collier ,415371,Y
+113,CMA361, Florida 2 - Glades ,312793,Y
+113,CMA362, Florida 3 - Hardee ,246150,Y
+113,CMA364, Florida 5 - Putnam ,188699,Y
+113,CMA370, Florida 11 - Monroe ,82874,Y
+113,CMA372, Georgia 2 - Dawson ,506087,N
+113,CMA373, Georgia 3 - Chattooga ,275303,Y
+113,CMA375, Georgia 5 - Haralson ,376063,Y
+113,CMA382, Georgia 12 - Liberty ,261810,Y
+113,CMA399, Illinois 6 - Montgomery ,193920,Y
+113,CMA419, Iowa 8 - Monona ,51604,Y
+113,CMA427, Iowa 16 - Lyon ,105536,Y
+113,CMA439, Kansas 12 - Hodgeman ,47709,Y
+113,CMA443, Kentucky 1 - Fulton ,196876,Y
+113,CMA446, Kentucky 4 - Spencer ,307028,Y
+113,CMA447, Kentucky 5 - Barren ,173875,Y
+113,CMA448, Kentucky 6 - Madison ,324168,Y
+113,CMA449, Kentucky 7 - Trimble ,212813,Y
+113,CMA450, Kentucky 8 - Mason ,135051,Y
+113,CMA451, Kentucky 9 - Elliott ,177588,Y
+113,CMA452, Kentucky 10 - Powell ,136245,Y
+113,CMA453, Kentucky 11 - Clay ,148691,Y
+113,CMA459, Louisiana 6 - Iberville ,170615,Y
+113,CMA465, Maine 3 - Kennebec ,239093,Y
+113,CMA471, Massachusetts 2 - Barnstable ,263851,Y
+113,CMA472, Michigan 1 - Gogebic ,194858,Y
+113,CMA480, Michigan 9 - Cass ,302559,Y
+113,CMA491, Minnesota 10 - Le Sueur ,266073,Y
+113,CMA495, Mississippi 3 - Bolivar ,125008,Y
+113,CMA500, Mississippi 8 - Claiborne ,150146,Y
+113,CMA501, Mississippi 9 - Copiah ,115979,Y
+113,CMA504, Missouri 1 - Atchison ,38904,Y
+113,CMA507, Missouri 4 - De Kalb ,72510,Y
+113,CMA510, Missouri 7 - Saline ,180564,Y
+113,CMA512, Missouri 9 - Bates ,81167,Y
+113,CMA513, Missouri 10 - Benton ,119008,Y
+113,CMA515, Missouri 12 - Maries ,144502,Y
+113,CMA523, Montana 1 - Lincoln ,193470,Y
+113,CMA527, Montana 5 - Mineral ,247859,Y
+113,CMA556, New Mexico 4 - Santa Fe ,299005,Y
+113,CMA558, New Mexico 6 - Lincoln ,290034,Y
+113,CMA559, New York 1 - Jefferson ,251808,Y
+113,CMA562, New York 4 - Yates ,352503,Y
+113,CMA571, North Carolina 7 - Rockingham ,343714,Y
+113,CMA579, North Carolina 15 - Cabarrus ,664588,N
+113,CMA586, Ohio 2 - Sandusky ,248152,Y
+113,CMA587, Ohio 3 - Ashtabula ,97574,Y
+113,CMA595, Ohio 11 - Columbiana ,101877,Y
+113,CMA600, Oklahoma 5 - Roger Mills ,60358,Y
+113,CMA606, Oregon 1 - Clatsop ,228773,Y
+113,CMA609, Oregon 4 - Lincoln ,274189,Y
+113,CMA612, Pennsylvania 1 - Crawford ,179952,Y
+113,CMA618, Pennsylvania 7 - Jefferson ,208300,Y
+113,CMA620, Pennsylvania 9 - Greene ,164758,Y
+113,CMA621, Pennsylvania 10 - Bedford ,218065,Y
+113,CMA624, Rhode Island 1 - Newport ,85643,Y
+113,CMA625, South Carolina 1 - Oconee ,78607,Y
+113,CMA644, Tennessee 2 - Cannon ,200380,Y
+113,CMA645, Tennessee 3 - Macon ,417295,Y
+113,CMA648, Tennessee 6 - Giles ,199455,Y
+113,CMA649, Tennessee 7 - Bledsoe ,341117,Y
+113,CMA650, Tennessee 8 - Johnson ,17948,Y
+113,CMA681, Virginia 1 - Lee ,122250,Y
+113,CMA692, Virginia 12 - Caroline ,207638,Y
+113,CMA706, West Virginia 6 - Lincoln ,138900,Y
+113,CMA710, Wisconsin 3 - Vilas ,142448,Y
+113,CMA713, Wisconsin 6 - Trempealeau ,132838,Y
+113,CMA714, Wisconsin 7 - Wood ,302898,Y
+113,CMA716, Wisconsin 9 - Columbia ,443418,Y
+113,CMA717, Wisconsin 10 - Door ,131988,Y
+113,CMA733, American Samoa ,49710,Y
