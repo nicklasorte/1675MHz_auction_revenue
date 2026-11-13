@@ -4,7 +4,7 @@
 unpaired 10-megahertz blocks at 1675–1695 MHz proposed in the Further Notice of Proposed Rulemaking
 (FNPRM), FCC 26-70, WT Docket No. 26-284. It compares nationwide licenses, Partial Economic Area (PEA)
 licenses, and PEA licenses with nationwide package bids, and models the coordination zones around the
-four NOAA Data Collection System receive sites. The 2020–2025 MHz block in the same proposal is out of
+four NOAA Data Collection System receive sites, which constrain terrestrial base-station downlink only. The 2020–2025 MHz block in the same proposal is out of
 scope.
 
 Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (v0.5, 11 figures).
@@ -13,13 +13,13 @@ Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (
 
 | Measure | Gross bids |
 |---|---|
-| Central estimate, before coordination (3 D2D and 4 terrestrial bidders) | $4.07B |
-| Simulated 10th to 90th percentile, before coordination | $3.33B–$4.50B |
-| Central estimate with NOAA zones at half / full NTIA distances | $3.80B / $3.30B |
+| Central estimate (3 D2D and 4 terrestrial bidders); NOAA zones don't change it | $4.07B |
+| Simulated 10th to 90th percentile | $3.33B–$4.50B |
 | Two or fewer D2D bidders, or SCS leased instead of bid | $3.46B |
+| Terrestrial downlink sets the price (2 D2D): no zones / half / full NTIA distances | $3.19B / $2.99B / $2.38B |
 | FCC's own estimate for the same 20 MHz (FNPRM App. C method) | $17.0B |
 
-| License design, before coordination | Nationwide | PEA only | PEA + packages |
+| License design, no zones | Nationwide | PEA only | PEA + packages |
 |---|---|---|---|
 | UE uplink | $4.07B | $4.65B | $4.65B |
 | D2D downlink | $5.14B | $5.21B | $5.21B |
@@ -27,7 +27,7 @@ Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (
 The FCC's estimate is higher mainly because it applies the Auction 113 average price, which is 98%
 paired spectrum; unpaired spectrum next door sold for one-fifth as much. PEA licenses with package
 bids match or beat the other designs in every case tested, including with zones, if at least three
-D2D bidders compete.
+D2D bidders compete. The zones bind only when terrestrial downlink bidders set the price.
 
 ## Documents
 
@@ -85,8 +85,8 @@ primary filings.
 
 - Draft, pre-decisional analysis prepared with AI assistance. It needs review by someone with
   auction experience before any figure is used, and NOAA-related statements need IRAC coordination.
-- Zone sizes use NTIA's coordination distances, which NTIA calls conservative, and half those
-  distances. The cost of a zone is calibrated on 19 AWS-3 markets.
+- Zones apply to terrestrial base-station downlink only. Zone sizes use NTIA's coordination distances,
+  which NTIA calls conservative, and smaller fractions. The cost of a zone is calibrated on 19 AWS-3 markets.
 - Except the Qualcomm 700 MHz sale (FCC 11-188), transaction terms come from releases and press reports.
 - Bidders are modeled as counts by class, not named firms.
 - The decision memo is still the v0.4 copy and names bidders; it needs a refresh to match v0.5.

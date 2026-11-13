@@ -150,8 +150,9 @@ for i, (key, lab, val, fmt, fill, src) in enumerate(inputs, 5):
 ws = sheet("Coordination", "Federal coordination (deferred)", [44, 14, 80])
 put(ws, "A5", "Population availability after coordination")
 put(ws, "B5", 1.0, fmt=PCT, fill=YELLOW)
-put(ws, "C5", "Headline figures are before coordination (100%). The NOAA zone analysis (four DCS sites, NTIA "
-    "Report 24-01 distances and smaller radii) is in scripts/analysis.py; results in data/csv/zone_*.csv.", wrap=True)
+put(ws, "C5", "The NOAA zones (four DCS sites) constrain terrestrial base-station downlink only, so they don't "
+    "change scenarios priced by D2D or uplink bids. The zone analysis for terrestrial downlink (NTIA Report 24-01 "
+    "distances and smaller radii) is in scripts/analysis.py; results in data/csv/zone_*.csv.", wrap=True)
 put(ws, "A7", LABEL, MARK)
 
 # ======================================================== Raw_A97

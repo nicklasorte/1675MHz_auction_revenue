@@ -20,11 +20,13 @@ dual axes, Times New Roman in report figures, and alt text. Every figure is buil
 
 1. The FCC's own estimate is about four times ours because it prices this unpaired band like paired
    spectrum (option 2).
-2. Our central estimate is about $4.1 billion before coordination; most outcomes fall between $3.3 and
-   $4.5 billion (options 1 and 3).
+2. Our central estimate is about $4.1 billion; most outcomes fall between $3.3 and $4.5 billion
+   (options 1 and 3).
 3. The number of D2D bidders matters more than anything else we can't observe (options 4 and 9).
-4. NTIA's coordination distances would put about 30% of the population inside a NOAA zone (option 6).
-5. Zones cost $0.3 to $0.8 billion, and PEA licenses with package bids hold value best (option 8).
+4. NTIA's coordination distances would put about 30% of the population inside a NOAA zone for terrestrial
+   base-station downlink (option 6).
+5. The zones bind only when terrestrial downlink sets the price: then they cost $0.2 to $0.8 billion;
+   package bids hold the floor (option 8).
 6. The zone cost is calibrated on the adjacent band's own auction (option 10).
 
 ## Ten options, and where each comes from
@@ -32,7 +34,7 @@ dual axes, Times New Roman in report figures, and alt text. Every figure is buil
 | # | Visual | What it shows here | Borrowed from | Best use | Status |
 |---|---|---|---|---|---|
 | 1 | **Valuation "football field"**: horizontal range bars, one per method, with the central value marked | Every estimate on one scale: benchmarks, scenarios, Monte Carlo, zone cases, and the FCC's $17B | Investment-banking fairness opinions and M&A valuation summaries | The one-slide answer to "how much?" | Option |
-| 2 | **Bridge (waterfall) chart** from the FCC's estimate to ours | $17.0B → paired-to-unpaired price → auction rule → NOAA zones → $3.3B | Corporate finance variance bridges | Explaining a disagreement with another agency's number | Built (Figure 6) |
+| 2 | **Bridge (waterfall) chart** from the FCC's estimate to ours | $17.0B → paired-to-unpaired price → auction rule → $4.1B | Corporate finance variance bridges | Explaining a disagreement with another agency's number | Built (Figure 6) |
 | 3 | **Quantile dotplot**: 50 dots, each a 2% chance | The Monte Carlo spread as countable outcomes ("8 of 50 dots fall below $3.5B") | Kay, Kola, Hullman, and Munson (CHI 2016), tested on bus-arrival predictions[1] | Non-technical readers; outperforms density plots for decisions[2] | Option |
 | 4 | **Fan chart** by number of D2D bidders | Median and 10th–90th percentile band as D2D bidders go from 0 to 6 | Bank of England inflation fan charts (since 1996)[3] | Showing that one input moves the whole distribution | Built (Figure 7) |
 | 5 | **Tornado diagram** | Which inputs move the central estimate most, ranked | Decision analysis in oil and gas (P10/P50/P90 reserves) and project finance[4] | Backup slide; tells staff where to spend verification effort | Built (Figure 8) |

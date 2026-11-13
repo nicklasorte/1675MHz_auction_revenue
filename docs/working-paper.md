@@ -4,15 +4,15 @@
 
 Working paper v0.5, November 13, 2026. Prepared with AI assistance. Reviewer: [CONFIRM]. Rule text as of: FCC 26-70, adopted October 29, 2026.
 
-All dollar figures are **gross bids** for the two 10-megahertz blocks at 1675–1695 MHz. The 2020–2025 MHz block in the same proposal is out of scope. Figures marked "before coordination" exclude the four National Oceanic and Atmospheric Administration (NOAA) coordination zones; section 6 adds them.
+All dollar figures are **gross bids** for the two 10-megahertz blocks at 1675–1695 MHz. The 2020–2025 MHz block in the same proposal is out of scope. The four National Oceanic and Atmospheric Administration (NOAA) coordination zones constrain terrestrial base-station downlink only; they don't affect uplink or D2D use. Section 6 models them.
 
 ## Executive summary
 
-- **Central estimate: $4.1 billion before coordination; about $3.3 billion with NOAA zones at NTIA's distances.** A simulation puts the middle 80 percent of pre-coordination outcomes between $3.3 and $4.5 billion.
+- **Central estimate: $4.1 billion.** A simulation puts the middle 80 percent of outcomes between $3.3 and $4.5 billion. The NOAA zones don't change it, because D2D bidders set the price.
 - **The FCC's own estimate is about four times higher.** Its regulatory impact analysis applies the Auction 113 average price, $2.53 per megahertz-pop, which is mostly paired spectrum. Unpaired spectrum at 1695–1710 MHz sold for $0.52. That one choice accounts for $13.3 billion of the gap (Figure 6).
 - **The number of D2D bidders matters most among things we can't observe.** With three or more independent direct-to-device (D2D) bidders, they set the price; with two or fewer, revenue falls to $3.46 billion. The number of terrestrial bidders doesn't change the central estimate (Figures 7 and 8).
-- **NTIA's coordination distances would put 30 percent of the U.S. population inside a NOAA zone.** Calibrated on how AWS-3 protection zones lowered Auction 97 prices, the zones cut revenue by $0.3 billion at half NTIA's distances and $0.8 billion at full distances (Figures 9–11).
-- **Partial Economic Area (PEA) licenses with nationwide package bids hold value best.** They match or beat nationwide and PEA-only licensing in every case tested, with and without zones, provided at least three D2D bidders compete for packages (Figures 3 and 10).
+- **The NOAA zones matter only when terrestrial downlink sets the price.** NTIA's coordination distances would put 30 percent of the U.S. population inside a zone for terrestrial base-station downlink. With three D2D bidders, the nationwide price doesn't change. With two or fewer, terrestrial downlink bidders set the price, and the zones cut revenue from $3.19 billion to $2.99 billion at half NTIA's distances and $2.38 billion at full distances, using a zone cost calibrated on Auction 97 (Figures 9–11).
+- **Partial Economic Area (PEA) licenses with nationwide package bids hold value best.** They match or beat nationwide and PEA-only licensing in every case tested, with and without zones; with large zones, PEA-only licensing falls below nationwide, and packages hold the floor. This holds provided at least three D2D bidders compete for packages (Figures 3 and 10).
 
 ## 1. The question
 
@@ -61,7 +61,7 @@ Only the Qualcomm terms are verified in a primary filing. The other transaction 
 
 **License areas.** Under PEA licensing, each of 406 contiguous PEAs plus a combined Alaska and Hawaii market is its own auction. Terrestrial values by PEA follow the fitted market-size curve; D2D per-PEA bids lose the 1.21 national premium. With package bidding, a nationwide package wins a block only if it beats the sum of the per-PEA bids, and pays at least that sum.
 
-**Coordination zones.** Each county's 2020 population-weighted center is inside a zone if it lies within the coordination distance of one of the four sites. NTIA's distances (Fairmont 459 km, Sioux Falls 346 km, Suitland 468 km, Wallops 446 km) come from its 2024 study, which NTIA calls conservative.[17] Zones are scaled from 0 to 100 percent of those distances. Population inside a zone keeps a fraction of its value, calibrated in section 6.2.
+**Coordination zones.** Each county's 2020 population-weighted center is inside a zone if it lies within the coordination distance of one of the four sites. NTIA's distances (Fairmont 459 km, Sioux Falls 346 km, Suitland 468 km, Wallops 446 km) come from its 2024 study, which NTIA calls conservative.[17] Zones are scaled from 0 to 100 percent of those distances. The zones apply to terrestrial base-station downlink only: inside a zone, a terrestrial bidder valuing the band as downlink keeps a fraction of its value, calibrated in section 6.2. Uplink and D2D values are unchanged.
 
 **Independent implementation.** A separate Python implementation recomputes the benchmarks from the FCC data and reproduces every workbook scenario and license-design result to within one cent before it runs the sections 5 and 6 analyses.
 
@@ -77,7 +77,7 @@ The point estimate steps from $3.46 billion to $4.07 billion (uplink value) or $
 
 ### 5.3 Why the FCC's estimate is higher
 
-The FCC estimates $21.2 billion for all 25 megahertz ($10.6 to $31.8 billion), using the Auction 113 average of $2.53 per megahertz-pop.[1] The FCC data reproduce that average ($2.527). Scaled to 20 megahertz, the FCC method gives $17.0 billion. Moving to the 2020 Census population subtracts $0.2 billion; pricing unpaired spectrum at the unpaired price subtracts $13.3 billion; the auction rule with three D2D bidders adds $0.6 billion; NOAA zones at NTIA's distances subtract $0.8 billion, leaving $3.3 billion (Figure 6). Paired licenses were 98 percent of the megahertz-pops sold in Auction 113, and paired spectrum sold for five times unpaired spectrum in Auction 97.
+The FCC estimates $21.2 billion for all 25 megahertz ($10.6 to $31.8 billion), using the Auction 113 average of $2.53 per megahertz-pop.[1] The FCC data reproduce that average ($2.527). Scaled to 20 megahertz, the FCC method gives $17.0 billion. Moving to the 2020 Census population subtracts $0.2 billion; pricing unpaired spectrum at the unpaired price subtracts $13.3 billion; the auction rule with three D2D bidders adds $0.6 billion, leaving $4.1 billion (Figure 6). The NOAA zones don't change the central case. Paired licenses were 98 percent of the megahertz-pops sold in Auction 113, and paired spectrum sold for five times unpaired spectrum in Auction 97.
 
 ### 5.4 License design
 
@@ -113,20 +113,20 @@ The adjacent 1695–1710 MHz licenses sold in Auction 97 with 27 federal earth s
 
 ### 6.3 Revenue with zones
 
-With 36 percent of value kept inside zones:
+The zones apply only where terrestrial bidders value the band as downlink (the 1675–1680 MHz identification and the FNPRM's coordination proposal both concern terrestrial base stations).[1][14] The table uses terrestrial downlink values ($0.48 base), D2D bidders at the satellite uplink value, and 36 percent of value kept inside zones:
 
-| Zone radius | UE uplink: nationwide / PEA + packages | D2D downlink: nationwide / PEA + packages |
+| Zone radius | 3 D2D bidders: nationwide / PEA only / PEA + packages | 2 D2D bidders: all designs |
 | --- | --- | --- |
-| None | $4.07B / $4.65B | $5.14B / $5.21B |
-| Half NTIA distance | $3.80B / $4.37B | $4.80B / $4.90B |
-| NTIA distance | $3.30B / $3.59B | $4.17B / $4.17B |
+| None | $4.07B / $4.45B / $4.45B | $3.19B |
+| Half NTIA distance | $4.07B / $4.38B / $4.38B | $2.99B |
+| NTIA distance | $4.07B / $3.89B / $4.07B | $2.38B |
 
-PEA licenses with packages stay at or above the other designs at every radius (Figure 10). Under PEA-only licensing, large zones hurt downlink revenue more than nationwide licensing does, because terrestrial bidders lose the large Northeast markets they would otherwise win.
+With three D2D bidders, the nationwide price is set by D2D bids, so the zones don't bind. Under PEA licensing, terrestrial bidders win the large Northeast markets, and large zones cut what they bid there; PEA-only revenue falls below nationwide at about 75 percent of NTIA's distances, while package bids hold the nationwide floor (Figure 10). With two or fewer D2D bidders, terrestrial downlink bidders set the price everywhere, and the zones cost $0.2 billion at half NTIA's distances and $0.8 billion at full distances.
 
 ## 7. Limitations
 
 - **Zone size.** NTIA calls its distances conservative, and the FCC asks whether deployment-based assumptions should replace them (para. 102). The result spans half to full NTIA distances; smaller zones cost less.
-- **Zone cost calibration.** It comes from 19 partly covered AWS-3 markets and applies the same retained share to terrestrial and D2D use.
+- **Zone cost calibration.** It comes from 19 partly covered AWS-3 markets, where federal protection zones constrained terrestrial base stations, and is applied to terrestrial downlink only.
 - **Bidder counts.** The headline assumes three D2D bidders. With two, the point estimate falls by $0.6 billion.
 - **Transactions.** EchoStar, Grain, and the 1670–1675 MHz lease are from releases and press reports; only the Qualcomm sale is verified in an FCC order.
 - **Not modeled.** 2020–2025 MHz, REAG licenses, alternative band plans, bidding credits, and timing.
@@ -159,7 +159,7 @@ PEA licenses with packages stay at or above the other designs at every radius (F
 | FCC estimate, 25 and 20 MHz | $21.19 and $16.96 billion | `fcc_ria_comparison.csv` | $21.2 and $17.0 billion |
 | Population inside zones at NTIA, half distance | 29.5%, 10.3% | `zone_sweep.csv` | 30%, 10% |
 | Value kept in a fully covered market | 35.7% (22.4–57.0%) | `analysis_summary.csv` | 36% |
-| Central case with zones at NTIA, half distance | $3,300 million; $3,803 million | `tornado.csv` | $3.3 and $3.8 billion |
+| Terrestrial downlink, 2 D2D: no zones, half, full NTIA distance | $3,190 million; $2,987 million; $2,382 million | `zone_sweep.csv` | $3.19, $2.99, $2.38 billion |
 | Qualcomm 700 MHz; 1670–1675 lease | $0.842; $0.120 per MHz-pop | `transactions.csv` | $0.84; $0.12 |
 
 ## Figures
@@ -186,25 +186,25 @@ Captions and alternative text. The images carry no title, so they can take a rep
 
 ![Histogram of simulated revenue with 10th percentile $3.33B, median $3.89B, and 90th percentile $4.50B.](../figures/fig5_monte_carlo.png)
 
-**Figure 6. The FCC's estimate is higher mainly because it prices unpaired spectrum like paired spectrum.** Bridge from the FCC's method scaled to 20 megahertz to this paper's estimate with zones. Source: FNPRM App. C and `fcc_ria_comparison.csv`, `tornado.csv`.
+**Figure 6. The FCC's estimate is higher mainly because it prices unpaired spectrum like paired spectrum.** Bridge from the FCC's method scaled to 20 megahertz to this paper's central estimate. Source: FNPRM App. C and `fcc_ria_comparison.csv`.
 
-![Waterfall chart from $17.0 billion (FCC method) down $0.2 billion for population, down $13.3 billion for unpaired prices, up $0.6 billion for the auction rule, to $4.1 billion, then down $0.8 billion for NOAA zones to $3.3 billion.](../figures/fig6_fcc_bridge.png)
+![Waterfall chart from $17.0 billion (FCC method) down $0.2 billion for population, down $13.3 billion for unpaired prices, up $0.6 billion for the auction rule, to $4.1 billion.](../figures/fig6_fcc_bridge.png)
 
 **Figure 7. A third D2D bidder raises the point estimate; the simulated median rises steadily.** Four terrestrial bidders; band is the 10th to 90th percentile of 2,000 draws per point. Source: `bidder_count_grid.csv`.
 
 ![Line chart of simulated median revenue from $3.2 billion with no D2D bidders to $4.3 billion with six, with a shaded percentile band and step lines for the point estimates at uplink and downlink values.](../figures/fig7_bidder_fan.png)
 
-**Figure 8. D2D valuation, NOAA zones, and the satellite benchmark move the central estimate most.** One input at a time from the $4.07 billion central case. Source: `tornado.csv`.
+**Figure 8. D2D valuation and the benchmarks move the central estimate most; NOAA zones and terrestrial bidder count don't.** One input at a time from the $4.07 billion central case. Source: `tornado.csv`.
 
-![Tornado chart: D2D downlink valuation raises the estimate to $5.14B; NOAA zones at NTIA distances lower it to $3.30B; satellite benchmark spans $3.46B to $4.83B; terrestrial bidder count has no effect.](../figures/fig8_tornado.png)
+![Tornado chart: D2D downlink valuation raises the estimate to $5.14B; NOAA zones have no effect because D2D bidders set the price; satellite benchmark spans $3.46B to $4.83B; terrestrial bidder count has no effect.](../figures/fig8_tornado.png)
 
 **Figure 9. At NTIA's distances, the four NOAA zones would cover 30 percent of the population.** Counties whose population center is within the coordination distance. Source: NTIA Report 24-01, Census 2020 (`zone_counties.csv`).
 
 ![Map of the contiguous United States with counties shaded inside NOAA coordination zones around Sioux Falls and around Fairmont, Suitland, and Wallops in the mid-Atlantic, at full and half NTIA distances.](../figures/fig9_zone_map.png)
 
-**Figure 10. PEA licenses with packages hold value best as zones grow.** Revenue by zone radius, with 36 percent of value kept inside zones. Source: `zone_sweep.csv`.
+**Figure 10. Zones bind when terrestrial downlink sets the price.** Revenue by zone radius with terrestrial bidders valuing the band as downlink, D2D bidders at the satellite uplink value, and 36 percent of value kept inside zones. Source: `zone_sweep.csv`.
 
-![Two line charts of revenue against zone radius for nationwide, PEA-only, and PEA-plus-package licensing; PEA plus packages stays highest, falling from $4.65B to $3.59B for uplink and from $5.21B to $4.17B for downlink.](../figures/fig10_zone_designs.png)
+![Two line charts of revenue against zone radius. With three D2D bidders, nationwide stays at $4.07B, PEA only falls from $4.45B to $3.89B, and PEA plus packages falls to the $4.07B floor. With two D2D bidders, all designs fall from $3.19B to $2.38B.](../figures/fig10_zone_designs.png)
 
 **Figure 11. AWS-3 protection zones lowered Auction 97 prices.** Price relative to the market-size expectation against the share of population inside 47 CFR 2.106 US88 zones; line is the regression fit. Source: `aws3_zone_calibration.csv`.
 

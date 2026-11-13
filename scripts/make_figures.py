@@ -95,7 +95,7 @@ for ax, case in zip(axes, ("UE uplink", "D2D downlink")):
         ax.barh(yy, base, color=BLUE if d == "pea_plus_packages" else GRAY, height=0.55, zorder=2)
         ax.plot([low], [yy], marker="|", ms=22, mew=2.5, color=DARK, zorder=4)
         ax.text(6.5, yy, f"${base:.2f}B", va="center", ha="right", color=DARK, fontweight="bold", fontsize=8.5)
-    ax.set_title(case, loc="left", fontsize=10); ax.set_xlim(0, 6.6); style_h(ax)
+    ax.set_title(case.replace("Terrestrial downlink, ", "").capitalize(), loc="left", fontsize=10); ax.set_xlim(0, 6.6); style_h(ax)
     ax.set_xlabel("Gross bids, billions of dollars")
 axes[0].set_yticks([2, 1, 0], [d[1] for d in designs])
 axes[1].plot([], [], marker="|", ms=12, mew=2.5, color=DARK, ls="none", label="Lowest case tested")
@@ -141,15 +141,11 @@ pop20 = 331449281
 fcc20_census = 2.53 * pop20 * 20 / B
 unp = float(fc["Auction 97 unpaired (A1 + B1) price, 20 MHz"]["gross_usd"]) / B
 central = float(fc["This paper, central (S1)"]["gross_usd"]) / B
-zkey = [k for k in tor if k.startswith("NOAA zones at NTIA distances")][0]
-zoned = float(tor[zkey]["low_case_usd"]) / B
 steps = [("FCC estimate method,\n20 MHz", fcc20, "total"),
          ("2020 Census\npopulation", fcc20_census - fcc20, "step"),
          ("Unpaired, not\npaired, prices", unp - fcc20_census, "step"),
          ("Auction rule:\n3 D2D bidders", central - unp, "step"),
-         ("This paper,\nbefore zones", central, "total"),
-         ("NOAA zones\n(NTIA distances)", zoned - central, "step"),
-         ("This paper,\nwith zones", zoned, "total")]
+         ("This paper,\ncentral case", central, "total")]
 fig, ax = plt.subplots(figsize=(6.5, 3.4))
 run = 0
 for i, (lab, v, kind) in enumerate(steps):
@@ -163,7 +159,7 @@ for i, (lab, v, kind) in enumerate(steps):
                linewidth=0.9, width=0.62, zorder=2)
         ax.text(i, hi + 0.3, f"{'+' if v >= 0 else '−'}${abs(v):.1f}B", ha="center", color=DARK, fontsize=8.5)
         run += v
-ax.set_xticks(range(len(steps)), [s_[0] for s_ in steps], fontsize=7.5)
+ax.set_xticks(range(len(steps)), [s_[0] for s_ in steps], fontsize=8)
 ax.set_ylabel("Gross bids, billions of dollars"); ax.set_ylim(0, 19.5)
 save(fig, "fig6_fcc_bridge")
 
@@ -289,7 +285,7 @@ save(fig, "fig9_zone_map")
 zs = rd("zone_sweep.csv")
 keep = sorted({r["value_retained_in_zone"] for r in zs})[1]  # calibrated value retained
 fig, axes = plt.subplots(1, 2, figsize=(6.5, 3.2), sharey=True)
-for ax, case in zip(axes, ("UE uplink", "D2D downlink")):
+for ax, case in zip(axes, ("Terrestrial downlink, 3 D2D bidders", "Terrestrial downlink, 2 D2D bidders")):
     rr = [r for r in zs if r["case"] == case and r["value_retained_in_zone"] == keep]
     xs = [float(r["radius_pct_of_ntia"]) for r in rr]
     ends = []
@@ -304,6 +300,10 @@ for ax, case in zip(axes, ("UE uplink", "D2D downlink")):
     if all(abs(a - b) < 1e-6 for a, b in zip(series["PEA only"], series["PEA + packages"])):
         ends = [e for e in ends if e[1] != "PEA only"]
         ends = [[e[0], "PEA only = PEA + packages", e[2]] if e[1] == "PEA + packages" else e for e in ends]
+    if all(abs(a - b) < 1e-6 for a, b in zip(series["Nationwide"], series["PEA + packages"])):
+        ends = [e for e in ends if e[1] != "Nationwide"]
+        ends = [[e[0], "All three designs", e[2]] if e[1].startswith("PEA only =") or e[1] == "PEA + packages"
+                else e for e in ends]
     ends.sort()
     for k in range(1, len(ends)):                      # keep labels at least 0.3B apart
         ends[k][0] = max(ends[k][0], ends[k - 1][0] + 0.3)

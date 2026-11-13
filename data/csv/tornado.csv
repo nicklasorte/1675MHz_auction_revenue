@@ -1,9 +1,8 @@
 input,low_case_usd,high_case_usd,low_change_usd,high_change_usd,swing_usd
 D2D values the band as downlink (no / yes),4073638216.2292,5142857142.857142,0.0,1069218926.6279426
-"NOAA zones at NTIA distances, calibrated value kept (with / without)",3300385361.7227054,4073638216.2292,-773252854.5064945,0.0
 Satellite uplink benchmark (low / high),3460286484.339698,4834651803.100689,-613351731.889502,761013586.871489
 Terrestrial uplink benchmark (low / high),4073638216.2292013,4834651803.100689,1.430511474609375e-06,761013586.871489
 D2D bidders (2 / 4; base 3),3460286484.339698,4073638216.2292013,-613351731.889502,1.430511474609375e-06
 EchoStar holdings include Bidco licenses (yes / no),3548889325.267073,4073638216.2292,-524748890.96212673,0.0
-"NOAA zones at half NTIA distances, calibrated value kept (with / without)",3802631651.419262,4073638216.2292,-271006564.80993795,0.0
 Terrestrial bidders (2 / 6; base 4),4073638216.2292013,4073638216.2292013,1.430511474609375e-06,1.430511474609375e-06
+NOAA zones at NTIA distances (terrestrial downlink only; with / without),4073638216.2292,4073638216.2292,0.0,0.0

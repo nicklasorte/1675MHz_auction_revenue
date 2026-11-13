@@ -9,8 +9,8 @@ license-area results; then it runs the analyses the workbook doesn't:
   model_validation.csv        Python model vs workbook, every scenario and license design
   bidder_count_grid.csv       revenue for 0-6 D2D x 0-6 terrestrial bidders (deterministic and Monte Carlo)
   ntia_zone_validation.csv    zone model vs NTIA Report 24-01 Table 11 (reference case)
-  zone_sweep.csv              revenue with the four NOAA coordination zones, by zone radius and by the value
-                              retained inside a zone, for each license design
+  zone_sweep.csv              revenue with the four NOAA coordination zones (terrestrial base-station downlink
+                              only), by zone radius, value retained inside a zone, D2D bidder count, and design
   zone_pea_impact.csv         encumbered population by PEA at NTIA's coordination distances
   aws3_zone_calibration.csv   do AWS-3 federal protection zones (47 CFR 2.106 US88) lower Auction 97 prices?
   backtest.csv                split-half test of the market-size curve; Auction 113 out-of-sample check
@@ -171,21 +171,22 @@ def pea_price(d, F, nD, nC, B=BLOCKS):
     return np.where(n_h >= B + 1, v_h, np.where(n_h + n_l >= B + 1, v_l, 0.0))
 
 
-def pea_rev(pC_base, pD_nat, nD, nC, avail=None, slope=SLOPE, prem=PREM, exposure=0.0, apply_prem=True):
-    A = np.ones_like(D) if avail is None else avail
-    F = carrier_values(pC_base, slope)
+def pea_rev(pC_base, pD_nat, nD, nC, avail_c=None, slope=SLOPE, prem=PREM, exposure=0.0, apply_prem=True):
+    """avail_c scales terrestrial values only: NOAA coordination zones constrain terrestrial base-station
+    downlink, not D2D or uplink use."""
+    A = np.ones_like(D) if avail_c is None else avail_c
+    F = carrier_values(pC_base, slope) * A
     d = pD_nat / (prem if apply_prem else 1) * (1 - exposure)
     p = pea_price(np.full_like(F, d), F, nD, nC)
-    return float((p * BLOCKS * MHZ * D * A).sum()), p, F, d
+    return float((p * BLOCKS * MHZ * D).sum()), p, F, d
 
 
-def package_rev(pC_base, pD_nat, nD, nC, avail=None, slope=SLOPE, theta=1.0):
+def package_rev(pC_base, pD_nat, nD, nC, avail_c=None, slope=SLOPE, theta=1.0):
     """PEA licenses plus all-or-nothing nationwide packages per block (workbook rows 72-91), with an optional
     threshold-problem factor theta: local bidders jointly mount only theta x the sum of their per-PEA bids."""
-    A = np.ones_like(D) if avail is None else avail
-    pea_total, _, _, _ = pea_rev(pC_base, pD_nat, nD, nC, avail=A, slope=slope)  # 0% exposure
+    pea_total, _, _, _ = pea_rev(pC_base, pD_nat, nD, nC, avail_c=avail_c, slope=slope)  # 0% exposure
     per_block_pea = pea_total / BLOCKS
-    pkg = pD_nat * MHZ * float((D * A).sum())
+    pkg = pD_nat * MHZ * float(D.sum())        # D2D package value is not affected by the zones
     if nD >= BLOCKS + 1:                      # D2D bidders compete for packages
         per_block = max(pkg, per_block_pea)
     elif nD >= 1 and pkg > theta * per_block_pea:  # thin package competition: core price set by local bids
@@ -346,22 +347,25 @@ robust["encumbered_indicator_any_share"] = bi[2]
 write("aws3_zone_calibration.csv", ["license", "market_name", "population_2010", "usd_per_mhz_pop",
                                     "population_share_in_us88_zones"], cal_rows)
 
-# 3b. FNPRM's four sites: sweep zone radius (share of NTIA's distance) and value retained inside zones
+# 3b. FNPRM's four sites: sweep zone radius (share of NTIA's distance) and value retained inside zones.
+# The zones constrain terrestrial base-station downlink only, so they apply only where terrestrial bidders value
+# the band as downlink (TDL). D2D values (SUL or SDL) and uplink values are unaffected.
 FOUR = [s["site"] for s in sites if s["protected_in_fnprm"] == "Y"]
 zone_rows, impact_rows = [], []
 for sc in (0.0, 0.1, 0.25, 0.5, 0.75, 1.0):
     m = encumbered(FOUR, sc)
     shr = pea_share(m)
     nat_share = float((shr * D).sum() / D.sum())
+    tdl = BM["TDL"]["Base"]
     for keep in (0.0, round(retained, 3), 0.5):
         A = 1 - (1 - keep) * shr
-        Fv = carrier_values(ab)
-        c_eff = float((Fv * D * A).sum() / D.sum())        # terrestrial value tracks where value sits
-        d_avail = float((D * A).sum() / D.sum())
-        for case, pD in (("UE uplink", sul), ("D2D downlink", grain_prior)):
-            nat = nat_rev(pD * d_avail, c_eff, 3, 4)
-            peo = pea_rev(ab, pD, 3, 4, avail=A)[0]
-            pk = package_rev(ab, pD, 3, 4, avail=A)
+        c_eff = float((carrier_values(tdl) * A * D).sum() / D.sum())   # terrestrial value tracks where it sits
+        for case, pD, nD in (("Terrestrial downlink, 3 D2D bidders", sul, 3),
+                             ("Terrestrial downlink, 2 D2D bidders", sul, 2),
+                             ("Terrestrial downlink, no D2D bidders", sul, 0)):
+            nat = nat_rev(pD, c_eff, nD, 4)
+            peo = pea_rev(tdl, pD, nD, 4, avail_c=A)[0]
+            pk = package_rev(tdl, pD, nD, 4, avail_c=A)
             zone_rows.append([sc, round(sc * 100), keep, case, nat_share, nat, peo, pk])
     if sc == 1.0:
         for i in np.argsort(-shr * D)[:25]:
@@ -469,11 +473,10 @@ zfull = encumbered(FOUR, 1.0)
 shf = pea_share(zfull)
 
 
-def zone_rev(keep, scale_=1.0):
-    shr = pea_share(encumbered(FOUR, scale_))
-    A = 1 - (1 - keep) * shr
-    c_eff = float((carrier_values(ab) * D * A).sum() / D.sum())
-    return nat_rev(sul * float((D * A).sum() / D.sum()), c_eff, 3, 4)
+def zone_rev(keep, scale_=1.0, nD=3):
+    """Central case with the zones applied to terrestrial downlink. In S1 terrestrial bidders value the band as
+    uplink, so the zones don't bind; this row shows that, and the downlink rows show where they do."""
+    return BASE
 
 
 tor = [
@@ -485,9 +488,7 @@ tor = [
      nat_rev(sul, BM["TUL"]["High"], 3, 4)),
     ("D2D values the band as downlink (no / yes)", BASE, nat_rev(grain_prior, ab, 3, 4)),
     ("EchoStar holdings include Bidco licenses (yes / no)", nat_rev(sul_all, ab, 3, 4), BASE),
-    ("NOAA zones at NTIA distances, calibrated value kept (with / without)", zone_rev(round(retained, 3)), BASE),
-    ("NOAA zones at half NTIA distances, calibrated value kept (with / without)",
-     zone_rev(round(retained, 3), 0.5), BASE),
+    ("NOAA zones at NTIA distances (terrestrial downlink only; with / without)", zone_rev(round(retained, 3)), BASE),
 ]
 tor_rows = [[lab, lo, hi, lo - BASE, hi - BASE, max(abs(lo - BASE), abs(hi - BASE))] for lab, lo, hi in tor]
 tor_rows.sort(key=lambda r: -r[5])
