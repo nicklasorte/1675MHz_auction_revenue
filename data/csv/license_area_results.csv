@@ -1,0 +1,27 @@
+case,license_design,sensitivity,sensitivity_value,gross_revenue_usd
+UE uplink,nationwide,base,,4073638216.2292
+UE uplink,pea_only,base,,4649631172.07772
+UE uplink,pea_plus_packages,base,,4649631172.07772
+D2D downlink,nationwide,base,,5142857142.85714
+D2D downlink,pea_only,base,,5212968609.60011
+D2D downlink,pea_plus_packages,base,,5212968609.60011
+UE uplink,pea_only,exposure_discount,0,4649631172.07772
+D2D downlink,pea_only,exposure_discount,0,5212968609.60011
+UE uplink,pea_only,exposure_discount,0.1,4450656232.96301
+D2D downlink,pea_only,exposure_discount,0.1,4934390188.66157
+UE uplink,pea_only,exposure_discount,0.2,4260942536.29937
+D2D downlink,pea_only,exposure_discount,0.2,4670206559.4975
+UE uplink,pea_only,exposure_discount,0.3,4083614034.97103
+D2D downlink,pea_only,exposure_discount,0.3,4419178957.35345
+UE uplink,pea_only,market_size_slope,0,3460286484.3397
+D2D downlink,pea_only,market_size_slope,0,4236621908.01556
+UE uplink,pea_only,market_size_slope,0.324896075116694,4095457718.13797
+D2D downlink,pea_only,market_size_slope,0.324896075116694,4632180702.77454
+UE uplink,pea_only,market_size_slope,0.649792150233387,4649631172.07772
+D2D downlink,pea_only,market_size_slope,0.649792150233387,5212968609.60011
+UE uplink,pea_plus_packages,market_size_slope,0,4073638216.2292
+D2D downlink,pea_plus_packages,market_size_slope,0,5142857142.85714
+UE uplink,pea_plus_packages,market_size_slope,0.324896075116694,4095457718.13797
+D2D downlink,pea_plus_packages,market_size_slope,0.324896075116694,5142857142.85714
+UE uplink,pea_plus_packages,market_size_slope,0.649792150233387,4649631172.07772
+D2D downlink,pea_plus_packages,market_size_slope,0.649792150233387,5212968609.60011

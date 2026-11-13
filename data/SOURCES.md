@@ -1,5 +1,7 @@
 # Data sources
 
+`python scripts/download_raw.py` downloads every file below and checks it against the SHA-256 listed here (`--force` re-downloads). A mismatch means the FCC changed the file after November 10, 2026.
+
 All raw files are public FCC records, downloaded November 10, 2026, and committed unedited. The
 SHA-256 checksum lets you confirm that a fresh download matches the committed copy.
 

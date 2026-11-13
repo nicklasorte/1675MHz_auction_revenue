@@ -1,0 +1,5 @@
+use_case,low_usd_per_mhz_pop,base_usd_per_mhz_pop,high_usd_per_mhz_pop,basis
+TDL,0.521993361080741,0.521993361080741,2.71480127414274,"SUSPENDED. No unpaired downlink comparable. Low and base: unpaired price. High: paired price × downlink share × 2, because the paired $/MHz-pop is spread over both halves. Needs a real comparable."
+TUL,0.177579017510596,0.521993361080741,0.729354136655005,Auction 97 unpaired 1695–1710 MHz. Low: B1 population-weighted 25th percentile. Base: A1 + B1. High: B1 (same 10 MHz block size).
+SUL,0.345706693820914,0.614519090815165,0.729354136655005,Low: SpaceX's own 2026 Auction 113 B1 price. Base: SpaceX/EchoStar on matched holdings. High: B1.
+SDL,0.614519090815165,0.775813591651319,1.7240302036696,Low: SUL base (no downlink premium). Base: Grain prior market price. High: SpaceX's Grain price (800 MHz low band; likely overstates 1.7 GHz).

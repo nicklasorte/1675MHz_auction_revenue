@@ -1,0 +1,29 @@
+measure,value,what_it_shows
+"Gross bids, all licenses ($)",44899451600,Reconciles to the published $44.9B.
+"Net bids, all licenses ($)",41329673325,Must equal the published net exactly.
+Licenses won,1611,"Must equal 1,611."
+A1 (5 MHz) $/MHz-pop,0.110340824918056,5 MHz block; heavily discounted.
+B1 (10 MHz) $/MHz-pop,0.729354136655005,Same block size as the FNPRM proposal.
+A1 + B1 $/MHz-pop,0.521993361080741,Published figure is $0.52 (Cramton).
+"Paired G, H, I, J $/MHz-pop",2.71480127414274,Published figure is $2.72.
+Paired price ÷ unpaired price,5.20083486985733,The unpaired discount.
+B1 population-weighted 25th percentile $/MHz-pop,0.177579017510596,Low case for terrestrial uplink.
+B1 population-weighted median $/MHz-pop,0.642031212585044,
+B1 population-weighted 75th percentile $/MHz-pop,1.2549405130059,Wide spread: one national price hides a lot.
+Northstar Wireless (Dish-affiliated designated entity),0.498452156861317,
+SNR Wireless LicenseCo (Dish-affiliated designated entity),0.353147537247715,
+2014 AWS Spectrum Bidco Corporation,0.125831305357882,"Ownership not verified. If EchoStar holds these too, its share is near 100%."
+"Northstar + SNR, less licenses resold in Auction 113",0.851000133702501,Default EchoStar holdings share (Transactions).
+"Northstar + SNR + Bidco, less resold",0.976831439060383,Upper bound on EchoStar holdings; gives the low EchoStar price.
+"Gross bids, all licenses ($)",3572889200,"Must equal $3,572,889,200."
+"Net bids, all licenses ($)",3572347950,"Must equal $3,572,347,950."
+Licenses in the results file,200,Parse-completeness test: must equal the 200 licenses won.
+Unpaired (A1 or B1) licenses in Auction 113,2,Only two: Auction 113 is anecdotal evidence for unpaired spectrum.
+"SpaceX's Auction 113 B1 win (Cincinnati, BEA049) $/MHz-pop",0.345706693820914,SpaceX's own competitive price for this use in 2026. Low case for satellite uplink.
+Licenses SpaceX won in Auction 113,2,
+Matched licenses,196,Defaulted 2015 licenses resold in 2026.
+"2026 $/pop ÷ 2015 $/pop, aggregate",0.988045929710999,"Near 1.0 supports the FCC's 'flat nominal' view, and supports applying $/MHz-pop to current population. Mostly paired licenses."
+B1 slope of ln($/MHz-pop) on ln(population),0.649792150233387,Bigger markets paid more per pop. Drives carrier values by PEA.
+R-squared of that fit,0.587766642281965,
+"2015 $/MHz-pop of the licenses EchoStar sold to SpaceX (Northstar + SNR, less resold)",0.512357965951709,Sum of the market-by-market 2015 prices for the same licenses.
+National-portfolio premium: EchoStar price ÷ (2015 price × flat-nominal ratio),1.21390514766659,"What one buyer paid for a national footprint over the sum of market prices. One deal, paid in stock."

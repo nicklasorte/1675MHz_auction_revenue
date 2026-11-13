@@ -24,6 +24,11 @@ space (SCS) rights instead of bidding, revenue is about $3.46B. See
 [`docs/1675-auction-valuation-plan.md`](docs/1675-auction-valuation-plan.md) for the full method
 and sensitivities.
 
+The working paper, [`docs/working-paper.md`](docs/working-paper.md), writes up the evidence, method,
+and results with five figures. Every dataset behind the calculation is in [`data/csv/`](data/csv/),
+and every figure and the code that makes it are in [`figures/`](figures/) and
+[`scripts/make_figures.py`](scripts/make_figures.py).
+
 ## Reproduce the analysis
 
 Requirements: Python 3.10 or later, `openpyxl` (`pip install -r requirements.txt`), `pdftotext`
@@ -33,13 +38,19 @@ Requirements: Python 3.10 or later, `openpyxl` (`pip install -r requirements.txt
 ./reproduce.sh
 ```
 
-The script runs five steps:
+The script runs eight steps:
 
+0. Downloads any missing FCC source file and checks it against its SHA-256 (`scripts/download_raw.py`).
 1. Extracts the Auction 97 tables from the FCC public notices with `pdftotext`.
 2. Parses per-license results for Auctions 97 and 113 (`scripts/parse_auctions.py`).
 3. Builds the workbook with live formulas (`scripts/build_workbook.py`).
 4. Recalculates every formula in headless LibreOffice (`scripts/recalc.py`).
 5. Verifies the `Checks` tab and the headline numbers (`scripts/verify.py`).
+6. Exports every dataset used in the calculation to `data/csv/` and checks the files against the
+   published FCC totals and the workbook (`scripts/export_csvs.py`, `scripts/check_csvs.py`).
+
+7. Rebuilds the working-paper figures from those CSVs (`scripts/make_figures.py`, needs `matplotlib`
+   and `numpy`). Figure files are deterministic: a rerun writes identical bytes.
 
 A clean run reproduces `outputs/1675-auction-valuation-v0.4.xlsx` exactly: all 35,402 non-empty
 cells match, and the parsed CSVs are byte-identical to the originals. The run prints PASS, with two
@@ -50,12 +61,14 @@ checks PENDING until the transaction terms and FNPRM paragraph citations are ver
 | Path | Contents |
 |---|---|
 | `reproduce.sh` | One-command rebuild |
-| `scripts/` | Parser, workbook builder, recalculation, and verification |
+| `scripts/` | Download, parser, workbook builder, recalculation, verification, CSV export, and figures |
 | `data/raw/` | Unedited FCC source files (public notices and FCC Public Reporting System downloads) |
 | `data/SOURCES.md` | Source URL and SHA-256 checksum for every raw file, plus the typed-in inputs |
 | `data/processed/` | Per-license CSVs produced by `parse_auctions.py` |
+| `data/csv/` | Every dataset used in the calculation, filtered and exported as CSV, plus all Monte Carlo draws (see `data/csv/README.md`) |
+| `figures/` | Working-paper figures as PNG, SVG, and PDF |
 | `outputs/` | Current workbook (v0.4); earlier versions in `outputs/archive/` |
-| `docs/` | Valuation plan, red-team review, and the decision memo |
+| `docs/` | Working paper, valuation plan, red-team review, and the decision memo |
 
 ## How the model works
 

@@ -19,6 +19,7 @@ from openpyxl.utils import get_column_letter
 
 DATA, OUT = Path(sys.argv[1]), sys.argv[2]
 PEA_FILE = Path(sys.argv[3])  # FCC PRS Auction 110 market download (406 PEAs, 2010 population)
+MC_OUT = Path(sys.argv[4]) if len(sys.argv) > 4 else None  # optional CSV of every Monte Carlo draw
 PEAS = list(csv.DictReader(open(PEA_FILE, encoding="utf-8-sig")))
 A97 = list(csv.DictReader(open(DATA / "a97_licenses.csv")))
 A113 = list(csv.DictReader(open(DATA / "a113_licenses.csv")))
@@ -510,7 +511,7 @@ big = [v[0] / v[1] / paired_all for k, v in paired_winners.items() if v[0] > 1e9
 sigma = st.pstdev([math.log(r) for r in big])
 rng = random.Random(1675)
 N = 10000
-rev, d2d_sets = [], 0
+rev, d2d_sets, draws = [], 0, []
 for _ in range(N):
     carriers = [tul_base * math.exp(rng.gauss(0, sigma)) for _ in range(4)]  # AT&T, VZ, TMO, Ligado
     d2d = [rng.uniform(spx113, sdl_base) for _ in range(3)]  # SpaceX, Amazon, AST
@@ -519,11 +520,22 @@ for _ in range(N):
     if price in d2d:
         d2d_sets += 1
     rev.append(2 * price * 10 * pop20)
+    draws.append(carriers + d2d + [price, "D2D" if price in d2d else "Carrier", 2 * price * 10 * pop20])
+if MC_OUT:
+    MC_OUT.parent.mkdir(parents=True, exist_ok=True)
+    with open(MC_OUT, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["draw", "att_usd_per_mhz_pop", "verizon_usd_per_mhz_pop", "tmobile_usd_per_mhz_pop",
+                    "ligado_usd_per_mhz_pop", "spacex_usd_per_mhz_pop", "amazon_leo_usd_per_mhz_pop",
+                    "ast_spacemobile_usd_per_mhz_pop", "clearing_price_usd_per_mhz_pop", "price_set_by",
+                    "gross_revenue_usd"])
+        for k, d in enumerate(draws, 1):
+            w.writerow([k] + d)
 rev.sort()
 pct = lambda p: rev[int(p * (N - 1))]
 
 ws = sheet("MonteCarlo", "Monte Carlo of the pricing rule (illustrative)", [58, 18, 70])
-put(ws, "A3", "Values below come from build_1675_workbook_v02.py (seed 1675, 10,000 draws). They are pasted "
+put(ws, "A3", "Values below come from scripts/build_workbook.py (seed 1675, 10,000 draws; every draw is in data/csv/monte_carlo_draws.csv). They are pasted "
     "values, not live formulas; rerun the script after changing assumptions.", wrap=True)
 ws.merge_cells("A3:C3")
 ws.row_dimensions[3].height = 30
