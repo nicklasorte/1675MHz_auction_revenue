@@ -24,7 +24,8 @@ space (SCS) rights instead of bidding, revenue is about $3.46B. See
 [`docs/1675-auction-valuation-plan.md`](docs/1675-auction-valuation-plan.md) for the full method
 and sensitivities.
 
-The working paper, [`docs/working-paper.md`](docs/working-paper.md), writes up the evidence, method,
+[`docs/next-phase-plan.md`](docs/next-phase-plan.md) plans the next round of analysis, and
+[`docs/literature-review.md`](docs/literature-review.md) reviews the related work. The working paper, [`docs/working-paper.md`](docs/working-paper.md), writes up the evidence, method,
 and results with five figures. Every dataset behind the calculation is in [`data/csv/`](data/csv/),
 and every figure and the code that makes it are in [`figures/`](figures/) and
 [`scripts/make_figures.py`](scripts/make_figures.py).
@@ -68,7 +69,7 @@ checks PENDING until the transaction terms and FNPRM paragraph citations are ver
 | `data/csv/` | Every dataset used in the calculation, filtered and exported as CSV, plus all Monte Carlo draws (see `data/csv/README.md`) |
 | `figures/` | Working-paper figures as PNG, SVG, and PDF |
 | `outputs/` | Current workbook (v0.4); earlier versions in `outputs/archive/` |
-| `docs/` | Working paper, valuation plan, red-team review, and the decision memo |
+| `docs/` | Working paper, literature review, next-phase plan, valuation plan, red-team review, and the decision memo |
 
 ## How the model works
 

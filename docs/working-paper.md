@@ -18,9 +18,32 @@ The FNPRM proposes two unpaired 10-megahertz blocks, 1675–1685 MHz and 1685–
 
 Two questions follow. First, what could 20 megahertz raise, given what comparable spectrum has sold for? Second, which license design raises the most, and how robust is that result?
 
-## 2. Evidence
+## 2. Related literature
 
-**Auction 97 unpaired spectrum.** The FCC's Auction 97 results (DA 15-131) and inventory (DA 14-1018) give a price for every license.[2] The paper parses all 1,614 licenses and reconciles them to the published totals: $41,329,673,325 in net bids and 1,611 licenses won, both exact. The unpaired 1695–1710 MHz blocks sold for $0.52 per megahertz-pop (A1 and B1 combined; Cramton et al. report the same figure[3]). The 10-megahertz B1 block, the same size as the FNPRM proposal, sold for $0.73. Paired spectrum sold for $2.71, about five times the unpaired price.
+Bazelon and McHenry conclude that market sales are the starting point for valuing spectrum but
+need adjustment, and that relying on one valuation technique leaves information unused.[6] Budget
+estimates are coarser: the Congressional Budget Office scored the P.L. 119-21 auctions at
+$85.0 billion without valuing bands one by one,[7] and Arner and Furchtgott-Roth applied
+megahertz-pop benchmarks with a 50 to 80 percent discount for limiting factors, including federal
+protection.[8] This paper uses the same benchmark approach but rebuilds the benchmarks from FCC
+per-license data and adds an explicit clearing rule.
+
+For AWS-3, Cramton and Sujarittanonta report the $2.72 paired and $0.52 unpaired prices that this
+paper reproduces, and show that prices rose with market size.[3] Work on the PCS auctions found
+geographic synergies[9] and that larger regional licenses would have raised efficiency,[10] which
+supports the national premium and the D2D exposure discount used here. Hazlett and Muñoz caution
+that revenue alone is a poor guide to allocation policy.[11] The pricing rule follows the theory of
+demand reduction in multi-unit auctions[12] and of package bidding and core pricing.[13]
+
+Two gaps remain. No published study isolates how much federal coordination areas lower auction
+prices, and there is little economic work on what D2D operators pay for spectrum. NTIA's 2026 letter
+identifying 1675–1680 MHz recommends per-base-station coordination around four NOAA sites,[14] so
+both gaps bear directly on this band. The full review is in `docs/literature-review.md`, and
+`docs/next-phase-plan.md` plans the work to close them.
+
+## 3. Evidence
+
+**Auction 97 unpaired spectrum.** The FCC's Auction 97 results (DA 15-131) and inventory (DA 14-1018) give a price for every license.[2] The paper parses all 1,614 licenses and reconciles them to the published totals: $41,329,673,325 in net bids and 1,611 licenses won, both exact. The unpaired 1695–1710 MHz blocks sold for $0.52 per megahertz-pop (A1 and B1 combined; Cramton and Sujarittanonta report the same figure[3]). The 10-megahertz B1 block, the same size as the FNPRM proposal, sold for $0.73. Paired spectrum sold for $2.71, about five times the unpaired price.
 
 **Market size.** Prices per person rose with market population. Across 174 sold B1 licenses, the slope of log price on log population is 0.65 (R² = 0.59) (Figure 2). Large markets paid more per person, which is why PEA licensing can raise more than one national price.
 
@@ -28,7 +51,7 @@ Two questions follow. First, what could 20 megahertz raise, given what comparabl
 
 **Transactions.** SpaceX agreed to buy EchoStar's unpaired AWS-3 licenses for about $2.6 billion in stock.[4] Adjusting for the 85 percent of the 1695–1710 MHz population those licenses cover, that is $0.61 per megahertz-pop. Measured against the 2015 prices of the same licenses, SpaceX paid 1.21 times the market-by-market total for a national footprint. For D2D downlink, the benchmark is the Grain 800 MHz spectrum: $3.6 billion when previously on the market ($0.78) and $8 billion reported for SpaceX ($1.72).[5] The transaction terms come from press releases and reports, not primary filings, and are flagged PENDING in the workbook.
 
-## 3. Method
+## 4. Method
 
 **Benchmarks by use.** Terrestrial uplink uses the Auction 97 unpaired price ($0.52 base, $0.18 low, $0.73 high). Satellite uplink uses the SpaceX/EchoStar price ($0.61 base, $0.35 low, $0.73 high). D2D downlink uses the Grain prior-market price ($0.78 base, $0.61 low, $1.72 high). Figure 1 shows the ranges.
 
@@ -40,17 +63,17 @@ Two questions follow. First, what could 20 megahertz raise, given what comparabl
 
 **Simulation.** A Monte Carlo run (seed 1675, 10,000 draws) draws carrier values from a lognormal distribution around the terrestrial uplink base (σ = 0.24, from Auction 97 winners that spent over $1 billion) and D2D values uniformly between SpaceX's Auction 113 price and the Grain prior-market price. The D2D range is a judgment, not evidence.
 
-## 4. Results
+## 5. Results
 
-### 4.1 Central estimate and range
+### 5.1 Central estimate and range
 
 The central case (S1: all bidders, D2D values the band as uplink) raises $4.07 billion. If D2D operators value the band as downlink, it raises $5.14 billion. With only two D2D bidders, or if D2D operators lease SCS rights instead of bidding, it raises $3.46 billion. The low and high benchmark cases bracket the result at $2.29 and $11.43 billion (Figure 4). The high case rests on SpaceX's Grain price for 800 MHz low-band spectrum, which likely overstates 1.7 GHz value.
 
-### 4.2 Simulation
+### 5.2 Simulation
 
 The simulated median is $3.89 billion, and the 10th and 90th percentiles are $3.33 and $4.50 billion (Figure 5). A D2D bidder sets the price in 43 percent of draws. The result is sensitive to whether three D2D values exceed the strongest carrier.
 
-### 4.3 License design
+### 5.3 License design
 
 Gross bids, in billions of dollars:
 
@@ -64,17 +87,18 @@ PEA licensing raises $0.6 billion more than nationwide licensing for uplink, bec
 
 Package bids cover that weakness. A D2D operator that wants a national footprint can bid for one without risking a partial footprint, so Option 3 equals Option 2 in the base case and equals Option 1 in the weak cases (Figure 3). The cost is auction complexity, and small bidders must jointly outbid a package.
 
-## 5. Limitations
+## 6. Limitations
 
 - **Upper bound.** No federal coordination zones are modeled. The four PEAs that contain NOAA receive sites hold about 3 percent of modeled uplink revenue, but the zones' reach is not known.
 - **Bidder count.** The headline depends on three or more independent D2D bidders.
 - **Market-size effect.** It rests on 2015 prices set mostly by Dish-affiliated designated entities.
 - **National premium.** The 1.21 factor comes from one stock deal by one buyer.
 - **Deal terms.** The EchoStar, Grain, and Globalstar figures aren't verified in primary filings. The Globalstar deal is a cross-check only and isn't used in any benchmark.
+- **Band identified so far.** NTIA has identified only 1675–1680 MHz and is still studying 1680–1695 MHz.[14] The 20-megahertz results assume the full band becomes available.
 - **Rule text.** FNPRM details come from a summary of the October 8 draft. The adopted text may change the license-area options, the SCS treatment, or the block plan.
 - **Not modeled.** Regional licenses, a 5-megahertz band plan, and secondary-market resale.
 
-## 6. Reproducing this paper
+## 7. Reproducing this paper
 
 Everything in this paper is reproduced by `./reproduce.sh`. It downloads the FCC source files and checks them against recorded checksums, parses them, builds the workbook with live formulas, recalculates it, verifies it, and exports every dataset used in the calculation to `data/csv/`. `python scripts/make_figures.py` then rebuilds every figure from those CSVs.
 
@@ -87,6 +111,8 @@ Everything in this paper is reproduced by `./reproduce.sh`. It downloads the FCC
 | Method and sensitivities | `docs/1675-auction-valuation-plan.md` |
 | Red-team review | `docs/1675-auction-redteam.md` |
 | Decision memo | `docs/license-design-memo.md` |
+| Literature review | `docs/literature-review.md` |
+| Next-phase plan | `docs/next-phase-plan.md` |
 
 ## Numbers ledger
 
@@ -132,8 +158,17 @@ Figure captions and alternative text are below; the images carry no title, so th
 
 1. FCC, *Auctioning the 1675-1695 MHz and 2020-2025 MHz Bands*, Further Notice of Proposed Rulemaking, FCC 26-70, WT Docket No. 26-284 ([FCC](https://docs.fcc.gov/public/attachments/FCC-26-70A1.pdf)). Proposal details from Covington's [summary of the October 8 draft](https://www.insideglobaltech.com/2026/10/13/fcc-proposes-to-auction-spectrum-for-terrestrial-and-space-based-broadband-services/).
 2. FCC, [DA 15-131](https://docs.fcc.gov/public/attachments/DA-15-131A2.pdf) and [DA 14-1018](https://docs.fcc.gov/public/attachments/DA-14-1018A2.pdf) (Auction 97); [DA 26-633](https://docs.fcc.gov/public/attachments/DA-26-633A1.pdf) and the [Auction 113 results by license](https://auctiondata.fcc.gov/public/projects/auction113/reports/results_by_license); [Auction 110 PEA populations](https://auctiondata.fcc.gov/public/projects/auction110/reports/market). Checksums in `data/SOURCES.md`.
-3. Cramton et al., "Bidding and Prices in the AWS-3 Auction" (2015). Used as an independent cross-check of the unpaired and paired prices.
+3. Peter Cramton and Pacharasut Sujarittanonta, "Bidding and Prices in the AWS-3 Auction" (May 2015) ([copy](https://www.mintic.gov.co/portal/historico/articles-103102_avantel_anexo_d_3_cramtonaws3auctionprices.pdf)). Used as an independent cross-check of the unpaired and paired prices.
 4. [EchoStar release, Nov. 6, 2025](https://ir.echostar.com/news-releases/news-release-details/echostar-agrees-sell-full-unpaired-aws-3-spectrum-license).
 5. [Fierce Network on SpaceX and Grain](https://www.fierce-network.com/wireless/spacexs-800-mhz-spectrum-grab-threatens-big-3-mobile-carriers); the $8 billion figure is as reported by the Wall Street Journal and is not verified here.
+6. Coleman Bazelon and Giulia McHenry, "Spectrum value," *Telecommunications Policy* 37(9) (2013): 737–747 ([RePEc](https://econpapers.repec.org/RePEc:eee:telpol:v:37:y:2013:i:9:p:737-747)).
+7. CBO, supplemental cost estimate for P.L. 119-21, Sec. 40002 (Oct. 28, 2025) ([CBO](https://www.cbo.gov/system/files/2025-10/PL%20119-21-Spectrum.pdf)).
+8. Kirk R. Arner and Harold Furchtgott-Roth, "Estimated Value of Potential Spectrum Auction Receipts in the Next Five-Year Window," Hudson Institute (July 18, 2024) ([Hudson](https://hudson.org/technology/estimated-value-potential-spectrum-auction-receipts-next-five-year-window-kirk-arner-harold-furchtgott-roth)).
+9. Ausubel, Cramton, McAfee, and McMillan, "Synergies in Wireless Telephony," *Journal of Economics & Management Strategy* 6(3) (1997): 497–527.
+10. Jeremy T. Fox and Patrick Bajari, "Measuring the Efficiency of an FCC Spectrum Auction," *American Economic Journal: Microeconomics* 5(1) (2013): 100–146.
+11. Thomas W. Hazlett and Roberto E. Muñoz, "A welfare analysis of spectrum allocation policies," *RAND Journal of Economics* 40(3) (2009): 424–454.
+12. Ausubel, Cramton, Pycia, Rostek, and Weretka, "Demand Reduction and Inefficiency in Multi-Unit Auctions," *Review of Economic Studies* 81(4) (2014): 1366–1400.
+13. Goeree and Holt, "Hierarchical package bidding," *Games and Economic Behavior* 70(1) (2010): 146–169; Day and Milgrom, "Core-selecting package auctions," *International Journal of Game Theory* 36 (2008): 393–407.
+14. NTIA, letter to FCC Chairman Brendan Carr identifying 1675–1680 MHz (Feb. 26, 2026) ([NTIA](https://www.ntia.gov/sites/default/files/2026-03/1675-mhz-identification-letter.pdf)).
 
 **DRAFT//PRE-DECISIONAL**
