@@ -10,11 +10,11 @@ Every range in this paper is conditional on stated assumptions. A range is not a
 
 ## Executive summary
 
-- **Central estimate: $4.1 billion.** In a simulation under the stated bidder-value assumptions, the middle 80 percent of outcomes falls between $3.3 and $4.5 billion. The NOAA zones don't change the central estimate, because D2D bidders set the price.
+- **Central estimate: $4.1 billion.** In a simulation under the stated bidder-value assumptions, the 10th to 90th percentile of simulated draws falls between $3.3 and $4.5 billion. This is not a probability interval, and the simulated median ($3.9 billion) is below the central case. The NOAA zones don't change the central case, in which three D2D bidders set the price. In simulated draws where terrestrial bidders set the price, zones would lower revenue.
 - **The FCC's own estimate is about four times higher.** Its regulatory impact analysis applies the Auction 113 average price, $2.53 per megahertz-pop, which is mostly paired spectrum. A megahertz-pop is one megahertz of spectrum for one person covered. Unpaired spectrum at 1695-1710 MHz sold for $0.52. That one choice accounts for $13.3 billion of the gap (Figure 6).
-- **The number of D2D bidders matters most among the inputs we can't observe.** With three or more independent D2D bidders, they set the price. With two or fewer, revenue falls to $3.46 billion. The number of terrestrial bidders doesn't change the central estimate (Figures 7 and 8).
+- **The number of D2D bidders is the largest driver among the structural inputs, but the benchmarks and valuations move the estimate more (Figure 8).** With three or more independent D2D bidders, they set the price. With two or fewer, revenue falls to $3.46 billion. The number of terrestrial bidders doesn't change the central estimate (Figures 7 and 8).
 - **The NOAA zones reduce revenue only when terrestrial downlink bidders set the price.** At NTIA's coordination distances, 30 percent of the U.S. population is inside a zone. With three D2D bidders, the nationwide price doesn't change. With two or fewer, the zones cut revenue from $3.19 billion to $2.99 billion at half NTIA's distances and $2.38 billion at full distances (Figures 9-11).
-- **Partial Economic Area (PEA) licenses with nationwide package bids protect value best.** They match or beat nationwide and PEA-only licensing in every case tested, with and without zones. With large zones, PEA-only licensing falls below nationwide, and package bids keep revenue at the nationwide level. This holds if at least three D2D bidders compete for packages (Figures 3 and 10).
+- **Partial Economic Area (PEA) licenses with nationwide package bids protect value best.** They match or beat nationwide and PEA-only licensing in every case tested with three or more D2D bidders, with and without zones. With one or two D2D bidders and local bidders below full combined value, packages can fall below nationwide (`package_threshold.csv`). With large zones, PEA-only licensing falls below nationwide, and package bids keep revenue at the nationwide level. This holds if at least three D2D bidders compete for packages (Figures 3 and 10).
 - **Financing costs and delay are sensitivities, not part of the central case.** Repricing every benchmark to today's cost of capital lowers the central estimate by $0.20 billion; each year of delay at a 7 percent discount rate lowers it by about 6.5 percent. The 2026 auction data can't distinguish the financing adjustment from none (Figures 12-14).
 - **A mid-band cross-check brackets the central estimate.** Starting from the 3.7 GHz and 3.45 GHz auctions and repricing them gives $3.71 to $4.65 billion, with band differences left unmodeled.
 
@@ -129,7 +129,7 @@ Table 1 shows the price and revenue after each stage, in two stage orders. The a
 | FCC method, 20 MHz | 2.53 | 16.95 | - | - |
 | 2020 Census population | 2.53 | 16.77 | -0.18 | -0.04 (second) |
 | Unpaired price (Auction 97) | 0.52 | 3.46 | -13.31 | -13.46 (first) |
-| Auction rule, 3 D2D bidders | 0.61 | 4.07 | +0.61 | +0.61 |
+| Switch to D2D value, 3 D2D bidders | 0.61 | 4.07 | +0.61 | +0.61 |
 | NOAA zones | 0.61 | 4.07 | 0.00 | 0.00 |
 | Availability delay (0 years) | 0.61 | 4.07 | 0.00 | 0.00 |
 | Financing (not applied) | 0.61 | 4.07 | 0.00 | 0.00 |
@@ -146,7 +146,7 @@ The zone model reproduces NTIA's own population results for the 25 largest PEAs 
 
 ### 6.2 What a zone costs: evidence from AWS-3
 
-The adjacent 1695-1710 MHz licenses sold in Auction 97 with 27 federal earth station protection zones (47 CFR 2.106, footnote US88). Regressing each B1 license's log price on log population and on the share of its population inside a zone gives a coefficient of -1.03 (standard error 0.24). The regression covers 172 markets, 19 of them with zones. A fully covered market sold for about 36 percent of the market-size expectation (95 percent range: 22 to 57 percent; Figure 11).
+The adjacent 1695-1710 MHz licenses sold in Auction 97 with 27 federal earth station protection zones (47 CFR 2.106, footnote US88). Regressing each B1 license's log price on log population and on the share of its population inside a zone gives a coefficient of -1.03 (standard error 0.24). The regression covers 172 markets, 19 of them with zones. A fully covered market sold for about 36 percent of the market-size expectation (95 percent statistical interval, sampling error only, extrapolated from partial-zone markets: 22 to 57 percent; Figure 11).
 
 Dropping Baltimore-Washington strengthens the effect (-1.20), and an any-zone indicator gives prices 49 percent lower. The estimate rests on 19 markets, mostly partly covered, and on a bidder pool dominated by Dish-affiliated entities. It is a calibration, not a precise measurement.
 
@@ -170,7 +170,7 @@ With three D2D bidders, D2D bids set the nationwide price, so the zones don't re
 
 ### 6.4 Cross-check of the zone discount
 
-A second estimate builds the value kept inside a zone from six assumed factors: usable bandwidth, site approval, technical performance, coordination timing, rule certainty, and reuse of existing sites. Central values give a product of 43 percent, with a range of 18 to 90 percent. The calibrated value is 36 percent, with a 95 percent range of 22 to 57 percent. The two central estimates are close and the assumed one falls inside the calibrated interval, but the factors have no public measurement behind them. The paper keeps the calibrated value as the central input (Appendix A).
+A second estimate builds the value kept inside a zone from six assumed factors: usable bandwidth, site approval, technical performance, coordination timing, rule certainty, and reuse of existing sites. Central values give a product of 43 percent, with a minimum-to-maximum product range of 18 to 90 percent, which isn't comparable to a statistical interval. The calibrated value is 36 percent, with a 95 percent range of 22 to 57 percent. The two central estimates are close and the assumed one falls inside the calibrated interval, but the factors have no public measurement behind them, so this is an illustration, not independent corroboration. The paper keeps the calibrated value as the central input (Appendix A).
 
 ## 7. Financing, timing, and a mid-band cross-check
 
@@ -190,7 +190,7 @@ If the band becomes available d years after the auction, value falls by the fact
 
 The FCC data for Auctions 107 (3.7 GHz) and 110 (3.45 GHz) reconcile to their published totals of about $81.17 billion and $22.5 billion in gross bids.[2] On the 2020 Census population of the 406 PEAs, they sold at $0.88 and $0.68 per megahertz-pop. Repricing each to today's financing gives $0.70 and $0.56. For 20 megahertz and the 2020 population, that is $4.65 billion from the 3.7 GHz anchor and $3.71 billion from the 3.45 GHz anchor.
 
-The second figure equals the first with a market-perception adjustment, because the later auction priced the same kind of spectrum lower. The central estimate of $4.07 billion sits between them. The method doesn't scale value by coverage area, which would raise the value of a lower band several times over, contrary to the low-band evidence. It leaves differences between mid-band and 1.7 GHz unpaired spectrum unmodeled, so it is a cross-check, not an estimate.
+The second figure is the 3.45 GHz anchor repriced for financing; the two anchors are not independent, because the later auction priced the same kind of spectrum lower. The central estimate of $4.07 billion sits between them. The method doesn't scale value by coverage area, which would raise the value of a lower band several times over, contrary to the low-band evidence. It leaves differences between mid-band and 1.7 GHz unpaired spectrum unmodeled, so it is a cross-check, not an estimate.
 
 ## 8. What the model doesn't capture
 
@@ -233,7 +233,6 @@ Run `./reproduce.sh`. The script does the following:
 | Figures (PNG, SVG, PDF) | `figures/` |
 | Visualization plan | `docs/dataviz-plan.md` |
 | Literature review | `docs/literature-review.md` |
-| Plan for this version | `docs/7ghz-method-lessons-plan.md` |
 
 ## Appendix A. Assumptions register
 
@@ -242,9 +241,9 @@ Evidence grades: *observed* means measured in public data; *calibrated* means fi
 | Input | Value | Basis | Grade | File |
 | --- | --- | --- | --- | --- |
 | Terrestrial uplink base | $0.52 | Auction 97 unpaired average | Observed | `benchmarks.csv` |
-| Satellite uplink base | $0.61 | EchoStar sale over 85% of population | Observed | `benchmarks.csv` |
-| D2D downlink base | $0.78 | Grain prior market value | Observed (press) | `benchmarks.csv` |
-| Terrestrial downlink base | $0.48 | Average of lease and Qualcomm sale | Observed | `benchmarks.csv` |
+| Satellite uplink base | $0.61 | EchoStar sale over 85% of population | Press-reported; coverage share assumed | `benchmarks.csv` |
+| D2D downlink base | $0.78 | Grain prior market value | Press-reported | `benchmarks.csv` |
+| Terrestrial downlink base | $0.48 | Average of lease and Qualcomm sale | Press-reported | `benchmarks.csv` |
 | Flat-nominal price ratio, 2026 to 2015 | 0.99 | 196 licenses in Auctions 97 and 113 | Observed | `financing_test.csv` |
 | National premium for D2D | 1.21 | Calibrated to the EchoStar price | Calibrated | `inputs.csv` |
 | Market-size elasticity | 0.65 (0.67 zone-free) | B1 licenses | Calibrated | `zone_free_curve.csv` |
