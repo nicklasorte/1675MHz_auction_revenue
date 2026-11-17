@@ -15,6 +15,13 @@ aws3_robust_indicator,-0.6756275501014639
 backtest_flat_median_abs_err,4.013737297802923
 backtest_median_abs_err,0.49298056433391885
 backtest_agg_err,0.002330696959112477
+zone_free_slope,0.6692395110757362
+zone_free_uplift,1.0995242063778239
+financing_now_wacc,0.0744945
+financing_factor_a97,0.86100324170792
+financing_observed_ratio,0.9880459297109987
+midband_a107_usd_per_mhz_pop,0.8804215193631418
+midband_a110_usd_per_mhz_pop,0.6837623606301974
 qualcomm_pmp,0.8422294994584495
 lease_pmp,0.1203024904698611
 a113_avg,2.5271398695265055

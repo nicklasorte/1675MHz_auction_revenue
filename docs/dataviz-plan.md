@@ -2,7 +2,7 @@
 
 # Data visualization plan: 1675–1695 MHz auction revenue
 
-November 13, 2026. Prepared with AI assistance. Reviewer: [CONFIRM].
+November 17, 2026. Prepared with AI assistance. Reviewer: [CONFIRM].
 
 ## Audience and job
 
@@ -33,7 +33,7 @@ dual axes, Times New Roman in report figures, and alt text. Every figure is buil
 
 | # | Visual | What it shows here | Borrowed from | Best use | Status |
 |---|---|---|---|---|---|
-| 1 | **Valuation "football field"**: horizontal range bars, one per method, with the central value marked | Every estimate on one scale: benchmarks, scenarios, Monte Carlo, zone cases, and the FCC's $17B | Investment-banking fairness opinions and M&A valuation summaries | The one-slide answer to "how much?" | Option |
+| 1 | **Valuation "football field"**: horizontal range bars, one per method, with the central value marked | Every estimate on one scale: benchmarks, scenarios, Monte Carlo, zone cases, and the FCC's $17B | Investment-banking fairness opinions and M&A valuation summaries | The one-slide answer to "how much?" | Built (Figure 14) |
 | 2 | **Bridge (waterfall) chart** from the FCC's estimate to ours | $17.0B → paired-to-unpaired price → auction rule → $4.1B | Corporate finance variance bridges | Explaining a disagreement with another agency's number | Built (Figure 6) |
 | 3 | **Quantile dotplot**: 50 dots, each a 2% chance | The Monte Carlo spread as countable outcomes ("8 of 50 dots fall below $3.5B") | Kay, Kola, Hullman, and Munson (CHI 2016), tested on bus-arrival predictions[1] | Non-technical readers; outperforms density plots for decisions[2] | Option |
 | 4 | **Fan chart** by number of D2D bidders | Median and 10th–90th percentile band as D2D bidders go from 0 to 6 | Bank of England inflation fan charts (since 1996)[3] | Showing that one input moves the whole distribution | Built (Figure 7) |
@@ -44,11 +44,17 @@ dual axes, Times New Roman in report figures, and alt text. Every figure is buil
 | 9 | **Heat map of bidder counts** | Revenue for every combination of 0–6 D2D and 0–6 terrestrial bidders | Sensitivity grids in pricing and valuation models | Showing that terrestrial bidder count barely matters | Option |
 | 10 | **Partial-residual calibration plot** | Auction 97 prices, net of market size, against the share of each market inside AWS-3 protection zones | Applied econometrics (hedonic price studies) | Defending the 36% value-retained assumption to economists | Built (Figure 11) |
 
+## Added in v0.6
+
+- **Figure 12:** a bridge for the stressed case (zones, delay, financing), the same form as option 2.
+- **Figure 13:** a line chart of revenue against years of delay, with a band for discount rates.
+- **Figure 14:** option 1, the football field, built from the CSVs.
+
 ## Recommendations
 
-- **For a leadership slide:** option 1 or option 2 as the hero, with option 4 as the second slide.
+- **For a leadership slide:** option 1 (Figure 14) or option 2 as the hero, with option 4 as the second slide.
   Option 2 answers the question leaders will ask first ("why is ours lower than the FCC's?").
-- **For the working paper:** options 2, 4, 5, 6, 8, and 10 are built. Option 3 could replace the
+- **For the working paper:** options 1, 2, 4, 5, 6, 8, and 10 are built. Option 3 could replace the
   Monte Carlo histogram (Figure 5) if the paper goes to non-technical readers.
 - **For a budget audience:** add option 7.
 - **Avoid:** pie charts of revenue by scenario (scenarios aren't parts of a whole), dual-axis

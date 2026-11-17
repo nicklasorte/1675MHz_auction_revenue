@@ -19,6 +19,17 @@ license-area results; then it runs the analyses the workbook doesn't:
   package_threshold.csv       package bidding when local bidders can't fully coordinate (threshold problem)
   tornado.csv                 one-at-a-time sensitivity of the central estimate
   fcc_ria_comparison.csv      this estimate against the FCC's own estimate (FNPRM App. C)
+  zone_free_curve.csv         Auction 97 benchmark and market-size curve with the AWS-3 zone effect removed
+  zone_free_designs.csv       license designs on the observed and zone-free curves
+  stage_table.csv             price and revenue after each stage, central and stressed cases, two stage orders
+  financing_wacc.csv          cost of capital at each benchmark's date and now (FRED yields, stated CAPM inputs)
+  financing_test.csv          observed 2026-to-2015 price ratio against the financing adjustment
+  financing_sensitivity.csv   scenario revenue with every benchmark repriced to current financing
+  timing_sensitivity.csv      revenue if availability is delayed 0-3 years, by discount rate and scope
+  zone_structural.csv         assumption-built value kept inside a zone against the calibrated value
+  midband_reconciliation.csv  Auctions 107 and 110 parsed and tied to published totals
+  midband_crosscheck.csv      mid-band-anchored cross-check, by stage
+  assumptions_register.csv    every input, value, basis, and evidence grade
 
 Every dollar figure is gross bids for 1675-1695 MHz (two 10 MHz blocks).
 """
@@ -344,6 +355,7 @@ robust = {
 Xi = np.column_stack([np.ones(len(cal)), np.log([c_[2] for c_ in cal]), [1.0 if c_[4] > 0 else 0.0 for c_ in cal]])
 bi, *_ = np.linalg.lstsq(Xi, Yc, rcond=None)
 robust["encumbered_indicator_any_share"] = bi[2]
+SLOPE_ZF = float(beta[1])   # market-size elasticity with the AWS-3 zone effect held out
 write("aws3_zone_calibration.csv", ["license", "market_name", "population_2010", "usd_per_mhz_pop",
                                     "population_share_in_us88_zones"], cal_rows)
 
@@ -352,24 +364,28 @@ write("aws3_zone_calibration.csv", ["license", "market_name", "population_2010",
 # the band as downlink (TDL). D2D values (SUL or SDL) and uplink values are unaffected.
 FOUR = [s["site"] for s in sites if s["protected_in_fnprm"] == "Y"]
 zone_rows, impact_rows = [], []
-for sc in (0.0, 0.1, 0.25, 0.5, 0.75, 1.0):
-    m = encumbered(FOUR, sc)
-    shr = pea_share(m)
-    nat_share = float((shr * D).sum() / D.sum())
-    tdl = BM["TDL"]["Base"]
-    for keep in (0.0, round(retained, 3), 0.5):
-        A = 1 - (1 - keep) * shr
-        c_eff = float((carrier_values(tdl) * A * D).sum() / D.sum())   # terrestrial value tracks where it sits
-        for case, pD, nD in (("Terrestrial downlink, 3 D2D bidders", sul, 3),
-                             ("Terrestrial downlink, 2 D2D bidders", sul, 2),
-                             ("Terrestrial downlink, no D2D bidders", sul, 0)):
-            nat = nat_rev(pD, c_eff, nD, 4)
-            peo = pea_rev(tdl, pD, nD, 4, avail_c=A)[0]
-            pk = package_rev(tdl, pD, nD, 4, avail_c=A)
-            zone_rows.append([sc, round(sc * 100), keep, case, nat_share, nat, peo, pk])
-    if sc == 1.0:
-        for i in np.argsort(-shr * D)[:25]:
-            impact_rows.append([CODES[i], NAMES[i], round(D[i]), round(100 * shr[i], 1), round(D[i] * shr[i])])
+# The market-size curve is the zone-free one (SLOPE_ZF): the observed Auction 97 curve already contains the
+# AWS-3 zone effect in the large Northeast markets, and applying the 1675-1695 MHz zones on top would count
+# part of that effect twice. "observed" rows keep the old curve for comparison.
+for curve, slope_ in (("zone-free", SLOPE_ZF), ("observed", SLOPE)):
+    for sc in (0.0, 0.1, 0.25, 0.5, 0.75, 1.0):
+        m = encumbered(FOUR, sc)
+        shr = pea_share(m)
+        nat_share = float((shr * D).sum() / D.sum())
+        tdl = BM["TDL"]["Base"]
+        for keep in (0.0, round(retained, 3), 0.5):
+            A = 1 - (1 - keep) * shr
+            c_eff = float((carrier_values(tdl, slope_) * A * D).sum() / D.sum())   # terrestrial value tracks where it sits
+            for case, pD, nD in (("Terrestrial downlink, 3 D2D bidders", sul, 3),
+                                 ("Terrestrial downlink, 2 D2D bidders", sul, 2),
+                                 ("Terrestrial downlink, no D2D bidders", sul, 0)):
+                nat = nat_rev(pD, c_eff, nD, 4)
+                peo = pea_rev(tdl, pD, nD, 4, avail_c=A, slope=slope_)[0]
+                pk = package_rev(tdl, pD, nD, 4, avail_c=A, slope=slope_)
+                zone_rows.append([sc, round(sc * 100), keep, case, nat_share, nat, peo, pk, curve])
+        if sc == 1.0 and curve == "zone-free":
+            for i in np.argsort(-shr * D)[:25]:
+                impact_rows.append([CODES[i], NAMES[i], round(D[i]), round(100 * shr[i], 1), round(D[i] * shr[i])])
 # county-level zone membership for the map figure
 near = np.full(len(CF), np.inf)
 ratio = np.full(len(CF), np.inf)
@@ -384,7 +400,7 @@ write("zone_counties.csv", ["fips", "pea", "population_2020", "km_to_nearest_sit
         int(ratio[i] <= 1.0), int(ratio[i] <= 0.5)] for i in range(len(CF))])
 write("zone_sweep.csv", ["radius_share_of_ntia", "radius_pct_of_ntia", "value_retained_in_zone", "case",
                          "national_population_share_encumbered", "nationwide_usd", "pea_only_usd",
-                         "pea_plus_packages_usd"], zone_rows)
+                         "pea_plus_packages_usd", "size_curve"], zone_rows)
 write("zone_pea_impact.csv", ["pea", "name", "population_2020_scaled", "encumbered_pct", "encumbered_population"],
       impact_rows)
 
@@ -468,6 +484,251 @@ for nD in (1, 2, 3):
 write("package_threshold.csv", ["d2d_bidders", "terrestrial_bidders", "local_coordination_share", "case",
                                 "pea_plus_packages_usd", "pea_only_usd", "nationwide_usd"], pth)
 
+# =============================================================== 11. zone-free benchmark and curve (double-count fix)
+# Auction 97 B1 prices already contain the AWS-3 protection-zone effect in 19 of 172 markets. Hold it out.
+zf_pop = np.array([c_[2] for c_ in cal], dtype=float)
+zf_price = np.array([c_[3] for c_ in cal])
+zf_share = np.array([c_[4] for c_ in cal])
+zf_keep = np.exp(beta[2] * zf_share)                 # fitted value kept in each market
+zf_rev = zf_price * zf_pop
+zf_up_rev = float((zf_rev / zf_keep).sum() / zf_rev.sum())       # zone-free revenue / observed revenue
+zf_up_pop = float(((zf_price / zf_keep) * zf_pop).sum() / (zf_price * zf_pop).sum())
+ZF_AB, ZF_B1P = ab * zf_up_rev, b1p * zf_up_rev
+write("zone_free_curve.csv", ["measure", "value", "note"], [
+    ["market_size_elasticity_observed", SLOPE, "174 B1 licenses, log price on log population"],
+    ["market_size_elasticity_zone_free", SLOPE_ZF, "172 markets, zone share held in the regression"],
+    ["zone_coefficient", beta[2], "log price per unit share of population inside an AWS-3 zone"],
+    ["average_value_kept_revenue_weighted", 1 / zf_up_rev, "observed B1 revenue / zone-free B1 revenue"],
+    ["zone_free_uplift_factor", zf_up_rev, "zone-free price / observed price, revenue weighted"],
+    ["population_share_inside_aws3_zones", float((zf_share * zf_pop).sum() / zf_pop.sum()), "B1 markets, 2010 population"],
+    ["terrestrial_uplink_base_observed_usd_per_mhz_pop", ab, "Auction 97 unpaired average"],
+    ["terrestrial_uplink_base_zone_free_usd_per_mhz_pop", ZF_AB, "observed base x uplift factor (sensitivity only)"],
+])
+
+dz = []
+for case, pD in (("UE uplink", sul), ("D2D downlink", grain_prior)):
+    for curve, slope_, base_ in (("observed", SLOPE, ab), ("zone-free", SLOPE_ZF, ZF_AB)):
+        dz.append([case, curve, nat_rev(pD, base_, 3, 4), pea_rev(base_, pD, 3, 4, slope=slope_)[0],
+                   package_rev(base_, pD, 3, 4, slope=slope_)])
+write("zone_free_designs.csv", ["case", "size_curve_and_base", "nationwide_usd", "pea_only_usd", "pea_plus_packages_usd"], dz)
+
+# =============================================================== 12. financing conditions: WACC at each anchor's date
+FRED = PROC.parent / "raw" / "fred"
+
+
+def fred(name):
+    out = {}
+    for r in rd(FRED / f"{name}.csv"):
+        v = r[name]
+        if v not in ("", "."):
+            out[r["observation_date"]] = float(v) / 100
+    return out
+
+
+RF, BAA = fred("DGS10"), fred("DBAA")
+CAPM = {"debt_share": 0.40, "beta": 0.80, "equity_risk_premium": 0.05, "tax_rate": 0.21}   # assumed; see register
+
+
+def wacc_window(d0, d1, capm=CAPM):
+    ks = [k for k in RF if d0 <= k <= d1 and k in BAA]
+    rf, kd = st.fmean(RF[k] for k in ks), st.fmean(BAA[k] for k in ks)
+    ke = rf + capm["beta"] * capm["equity_risk_premium"]
+    w = (1 - capm["debt_share"]) * ke + capm["debt_share"] * kd * (1 - capm["tax_rate"])
+    return rf, kd, w, len(ks)
+
+
+def annuity_pv(r, n=TERM):
+    return (1 - (1 + r) ** -n) / r
+
+
+last = sorted(k for k in RF if k in BAA)[-20:]
+NOW = (last[0], last[-1])
+WINDOWS = [("Auction 97 (AWS-3)", "2014-11-13", "2015-01-29"), ("1670-1675 MHz lease", "2007-07-02", "2007-07-27"),
+           ("Qualcomm 700 MHz sale", "2010-12-01", "2010-12-31"), ("Auction 107 (3.7 GHz)", "2020-12-08", "2021-01-15"),
+           ("Auction 110 (3.45 GHz)", "2021-10-04", "2021-11-17"), ("EchoStar sale to SpaceX", "2025-10-15", "2025-11-14"),
+           ("Today (last 20 observations)", NOW[0], NOW[1])]
+w_now = wacc_window(*NOW)[2]
+wrows, FACT = [], {}
+for lab, d0, d1 in WINDOWS:
+    rf, kd, w, n = wacc_window(d0, d1)
+    FACT[lab] = annuity_pv(w_now) / annuity_pv(w)
+    wrows.append([lab, d0, d1, n, rf, kd, w, FACT[lab]])
+write("financing_wacc.csv", ["anchor", "window_start", "window_end", "daily_observations", "treasury_10y",
+                             "baa_yield", "wacc", "pv_factor_to_today_15yr"], wrows)
+
+# test: do 2026 prices on the same licenses look like the 2015 prices repriced at today's cost of capital?
+mp_ = []
+for x in A113:
+    y = d97.get("AW-" + x["license"])
+    if y and y["sold"] == "Y" and int(y["population_2010"]) > 0 and int(x["population"]) > 0:
+        mp_.append((f(y["gross_bid"]), int(y["population_2010"]), f(x["gross_bid"]), int(x["population"])))
+rb3 = random.Random(1675)
+boots = []
+for _ in range(2000):
+    smp = [mp_[rb3.randrange(len(mp_))] for _ in mp_]
+    n97 = sum(a for a, _, _, _ in smp); d97_ = sum(b for _, b, _, _ in smp)
+    n13 = sum(c for _, _, c, _ in smp); d13_ = sum(d for _, _, _, d in smp)
+    boots.append((n13 / d13_) / (n97 / d97_))
+boots.sort()
+pred = FACT["Auction 97 (AWS-3)"]
+write("financing_test.csv", ["measure", "value", "note"], [
+    ["observed_2026_to_2015_price_ratio", flat, "same licenses, price per person, nominal"],
+    ["observed_ratio_bootstrap_p2.5", boots[49], "2,000 resamples of the licenses sold in both auctions"],
+    ["observed_ratio_bootstrap_p97.5", boots[1949], ""],
+    ["ratio_predicted_by_financing_adjustment", pred, "15-year annuity factor at today's WACC / at Auction 97 WACC"],
+    ["prediction_inside_bootstrap_interval", int(boots[49] <= pred <= boots[1949]), "0 means the data reject a separate adjustment"],
+])
+
+# revenue with each benchmark repriced to today's financing (sensitivity; not in the central case)
+BMF = {"TUL": {k: v * FACT["Auction 97 (AWS-3)"] for k, v in BM["TUL"].items()},
+       "SUL": {"Low": BM["SUL"]["Low"], "Base": sul * FACT["EchoStar sale to SpaceX"], "High": b1p * FACT["Auction 97 (AWS-3)"]},
+       "SDL": BM["SDL"],
+       "TDL": {"Low": lease * FACT["1670-1675 MHz lease"], "Base": 0.0, "High": qualcomm * FACT["Qualcomm 700 MHz sale"]}}
+BMF["TDL"]["Base"] = (BMF["TDL"]["Low"] + BMF["TDL"]["High"]) / 2
+fs = []
+for j in range(9):
+    c = chr(66 + j)
+    name, case, tu, du = ws[f"{c}4"].value, ws[f"{c}6"].value, ws[f"{c}7"].value, ws[f"{c}8"].value
+    nD, nC, both = int(ws[f"{c}9"].value), int(ws[f"{c}10"].value), int(ws[f"{c}11"].value) == 1
+    base_v = nat_rev(BM[du][case], BM[tu][case], nD, nC, wants_both=both)
+    adj_v = nat_rev(BMF[du][case], BMF[tu][case], nD, nC, wants_both=both)
+    fs.append([name, base_v, adj_v, adj_v - base_v, adj_v / base_v - 1])
+write("financing_sensitivity.csv", ["scenario", "base_usd", "repriced_to_today_usd", "change_usd", "change_pct"], fs)
+
+# =============================================================== 13. availability timing sensitivity
+full_share = pea_share(encumbered(FOUR, 1.0))
+KEEP = round(retained, 3)
+tim = []
+for r_ in (0.05, 0.07, 0.09):
+    for dly in (0, 1, 2, 3):
+        fac = (1 + r_) ** -dly
+        for scope in ("nationwide", "zone areas only"):
+            if scope == "nationwide":
+                cen = BASE * fac
+                zon = nat_rev(sul, float((carrier_values(BM["TDL"]["Base"], SLOPE_ZF) * (1 - (1 - KEEP) * full_share) * D).sum() / D.sum()), 2, 4) * fac
+            else:
+                cen = BASE                                   # D2D sets the price; zones don't touch D2D
+                Az = (1 - full_share) + full_share * KEEP * fac
+                zon = nat_rev(sul, float((carrier_values(BM["TDL"]["Base"], SLOPE_ZF) * Az * D).sum() / D.sum()), 2, 4)
+            tim.append([r_, dly, scope, round(fac, 6), cen, zon])
+write("timing_sensitivity.csv", ["discount_rate", "delay_years", "scope", "value_factor",
+                                 "central_3_d2d_usd", "terrestrial_downlink_2_d2d_full_zones_usd"], tim)
+
+# =============================================================== 14. structural build-up of value kept inside a zone
+FACTORS = [("Share of the band usable inside a zone", 0.70, 0.85, 1.00),
+           ("Share of sites approved after coordination", 0.60, 0.80, 0.95),
+           ("Technical performance retained (power, antenna limits)", 0.70, 0.80, 0.95),
+           ("Timing discount for coordination", 0.85, 0.92, 1.00),
+           ("Certainty of rules and process", 0.80, 0.90, 1.00),
+           ("Reuse of existing sites", 0.90, 0.95, 1.00)]
+prod = lambda i: float(np.prod([f_[i] for f_ in FACTORS]))
+zs_rows = [[f_[0], f_[1], f_[2], f_[3], "assumed"] for f_ in FACTORS]
+zs_rows.append(["Product of factors", prod(1), prod(2), prod(3), "assumed"])
+zs_rows.append(["Calibrated on Auction 97 (95% interval)", lo95, retained, hi95, "calibrated"])
+write("zone_structural.csv", ["factor", "low", "central", "high", "evidence_grade"], zs_rows)
+
+# =============================================================== 15. mid-band cross-check (Auctions 107 and 110)
+M7, M0 = rd(PROC / "a107_licenses.csv"), rd(PROC / "a110_licenses.csv")
+POP406 = POP20 - AKHI
+rec = []
+for lab, M_, nlic_pub, gross_pub in (("Auction 107", M7, 5684, 81.17e9), ("Auction 110", M0, 4041, 22.5e9)):
+    gross = sum(f(x["gross_bid"]) for x in M_)
+    mhz_pop10 = sum(int(x["mhz"]) * int(x["population_2010"]) for x in M_)
+    nmk = len({x["market"] for x in M_})
+    mhz_tot = {"Auction 107": 280, "Auction 110": 100}[lab]
+    rec.append([lab, len(M_), nmk, mhz_tot, gross, sum(f(x["net_bid"]) for x in M_), gross_pub,
+                gross / (mhz_tot * POP406), gross / (mhz_tot * sum(int(x["population_2010"]) for x in {y["market"]: y for y in M_}.values()))])
+write("midband_reconciliation.csv", ["auction", "licenses_won", "pea_markets", "mhz", "gross_bids_usd", "net_bids_usd",
+                                     "published_gross_rounded_usd", "usd_per_mhz_pop_2020_census", "usd_per_mhz_pop_2010_census"], rec)
+p107, p110 = rec[0][7], rec[1][7]
+fin107 = FACT["Auction 107 (3.7 GHz)"]
+fin110 = FACT["Auction 110 (3.45 GHz)"]
+percep = p110 / p107                                  # Auction 110 price relative to Auction 107, both repriced below
+mb = []
+for lab, p0 in (("Auction 107 anchor", p107), ("Auction 110 anchor", p110)):
+    fin_ = fin107 if "107" in lab else fin110
+    stages = [("Anchor price (nominal, 2020 Census)", p0)]
+    stages.append(("Financing: reprice to today's cost of capital", stages[-1][1] * fin_))
+    if "107" in lab:
+        stages.append(("Market perception: Auction 110 price relative to Auction 107", stages[-1][1] * (p110 * fin110) / (p107 * fin107)))
+    prev = None
+    for nm, v in stages:
+        mb.append([lab, nm, v, v * 20 * POP20, "" if prev is None else v * 20 * POP20 - prev])
+        prev = v * 20 * POP20
+write("midband_crosscheck.csv", ["anchor", "stage", "usd_per_mhz_pop", "gross_20mhz_usd", "change_usd"], mb)
+
+# =============================================================== 16. stage table (central and stressed cases)
+fcc_pop = 335073176
+stage = []
+orders = {"population first": ("pop", "price"), "price first": ("price", "pop")}
+for oname, (a_, b_) in orders.items():
+    pmp_, pop_ = 2.53, fcc_pop
+    cur = pmp_ * pop_ * 20
+    stage.append(["Central", oname, 0, "FCC method, 20 MHz", pmp_, cur, 0.0])
+    k = 1
+    for st_ in (a_, b_):
+        if st_ == "pop":
+            pop_, nm = POP20, "2020 Census population"
+        else:
+            pmp_, nm = ab, "Unpaired price (Auction 97 A1+B1 average)"
+        new = pmp_ * pop_ * 20
+        stage.append(["Central", oname, k, nm, pmp_, new, new - cur]); cur = new; k += 1
+    stage.append(["Central", oname, k, "Auction rule: 3 D2D bidders, third-highest bid", BASE / (20 * POP20), BASE, BASE - cur])
+    cur = BASE; k += 1
+    stage.append(["Central", oname, k, "NOAA zones (terrestrial downlink only)", BASE / (20 * POP20), BASE, 0.0]); k += 1
+    stage.append(["Central", oname, k, "Availability delay (0 years)", BASE / (20 * POP20), BASE, 0.0]); k += 1
+    stage.append(["Central", oname, k, "Financing (sensitivity only; not applied)", BASE / (20 * POP20), BASE, 0.0])
+zr = lambda sc_, keep_: [r for r in zone_rows if r[8] == "zone-free" and r[0] == sc_ and r[2] == keep_
+                         and r[3] == "Terrestrial downlink, 2 D2D bidders"][0][5]
+z_none, z_full = zr(0.0, KEEP), zr(1.0, KEEP)
+fac2 = 1.07 ** -2
+Af_ = 1 - (1 - KEEP) * full_share
+fin_zone = nat_rev(BMF["SUL"]["Base"], float((carrier_values(BMF["TDL"]["Base"], SLOPE_ZF) * Af_ * D).sum() / D.sum()), 2, 4) * fac2
+stage.append(["Stressed", "zones, delay, financing", 0, "Terrestrial downlink, 2 D2D, no zones", z_none / (20 * POP20), z_none, 0.0])
+stage.append(["Stressed", "zones, delay, financing", 1, "NOAA zones at NTIA distances", z_full / (20 * POP20), z_full, z_full - z_none])
+stage.append(["Stressed", "zones, delay, financing", 2, "Availability delay, 2 years at 7%", z_full * fac2 / (20 * POP20),
+              z_full * fac2, z_full * fac2 - z_full])
+stage.append(["Stressed", "zones, delay, financing", 3, "Financing repricing (sensitivity)", fin_zone / (20 * POP20),
+              fin_zone, fin_zone - z_full * fac2])
+write("stage_table.csv", ["case", "stage_order", "stage_number", "stage", "usd_per_mhz_pop_after", "gross_usd_after",
+                          "change_usd"], stage)
+
+# =============================================================== 17. assumptions register
+reg = [
+    ["Benchmark: terrestrial uplink base", ab, "Auction 97 unpaired (A1+B1) average", "observed", "benchmarks.csv"],
+    ["Benchmark: satellite uplink base", sul, "EchoStar sale price over 85% of population, 15-year term", "observed",
+     "benchmarks.csv"],
+    ["Benchmark: D2D downlink base", grain_prior, "Grain 800 MHz prior market value over 14 years", "observed (press)",
+     "benchmarks.csv"],
+    ["Benchmark: terrestrial downlink base", BM["TDL"]["Base"], "Average of 1670-1675 MHz lease and Qualcomm 700 MHz sale",
+     "observed (lease capitalized)", "benchmarks.csv"],
+    ["Nominal-flat price ratio, 2026 to 2015", flat, "196 licenses sold in Auctions 97 and 113", "observed", "financing_test.csv"],
+    ["National premium for D2D", PREM, "Calibrated to the EchoStar price relative to holdings", "calibrated", "inputs.csv"],
+    ["Market-size elasticity (observed curve)", SLOPE, "174 B1 licenses", "calibrated", "zone_free_curve.csv"],
+    ["Market-size elasticity (zone-free curve)", SLOPE_ZF, "172 markets with zone share held in the regression", "calibrated",
+     "zone_free_curve.csv"],
+    ["Value kept inside a zone", retained, "Auction 97 B1 prices on AWS-3 protection zones; 95% interval 22%-57%", "calibrated",
+     "analysis_summary.csv"],
+    ["Zone distances (km): Fairmont, Sioux Falls, Suitland, Wallops", "459, 346, 468, 446", "NTIA Report 24-01 Table 9",
+     "observed", "ntia_zone_validation.csv"],
+    ["Carrier value spread (lognormal sigma)", sigma, "Auction 97 paired winners over $1 billion", "calibrated",
+     "monte_carlo_summary.csv"],
+    ["D2D value in simulation", "uniform between EchoStar and Grain prior prices", "Spread of D2D comparables", "assumed",
+     "monte_carlo_summary.csv"],
+    ["D2D bidders in base case", 3, "No named bidder list", "assumed", "bidder_count_grid.csv"],
+    ["Terrestrial bidders in base case", 4, "No named bidder list", "assumed", "bidder_count_grid.csv"],
+    ["Discount rate for capitalizing and for delay", CAPRATE, "FCC RIA rate (OMB Circular A-4)", "observed (FCC)", "income_check.csv"],
+    ["License term (years)", TERM, "FNPRM para. 56", "observed (FCC)", "income_check.csv"],
+    ["CAPM debt share", CAPM["debt_share"], "Typical wireless capital structure; replace with a sourced figure", "assumed",
+     "financing_wacc.csv"],
+    ["CAPM equity beta", CAPM["beta"], "Typical regulated-telecom range 0.6-1.0", "assumed", "financing_wacc.csv"],
+    ["CAPM equity risk premium", CAPM["equity_risk_premium"], "Common practitioner value", "assumed", "financing_wacc.csv"],
+    ["Corporate tax rate", CAPM["tax_rate"], "U.S. federal statutory rate", "observed", "financing_wacc.csv"],
+    ["Structural zone factors (six)", "see file", "Illustrative ranges; no public measurement", "assumed", "zone_structural.csv"],
+    ["Availability delay (years)", "0 to 3", "No public clearing schedule; sensitivity only", "assumed", "timing_sensitivity.csv"],
+]
+write("assumptions_register.csv", ["input", "value", "basis", "evidence_grade", "file"], reg)
+
 # =============================================================== 9. tornado (central estimate, S1 nationwide)
 zfull = encumbered(FOUR, 1.0)
 shf = pea_share(zfull)
@@ -489,6 +750,8 @@ tor = [
     ("D2D values the band as downlink (no / yes)", BASE, nat_rev(grain_prior, ab, 3, 4)),
     ("EchoStar holdings include Bidco licenses (yes / no)", nat_rev(sul_all, ab, 3, 4), BASE),
     ("NOAA zones at NTIA distances (terrestrial downlink only; with / without)", zone_rev(round(retained, 3)), BASE),
+    ("Availability delayed 2 years (yes / no; 7%)", BASE * 1.07 ** -2, BASE),
+    ("Benchmarks repriced to today's financing (yes / no)", fs[0][2], BASE),
 ]
 tor_rows = [[lab, lo, hi, lo - BASE, hi - BASE, max(abs(lo - BASE), abs(hi - BASE))] for lab, lo, hi in tor]
 tor_rows.sort(key=lambda r: -r[5])
@@ -522,6 +785,9 @@ SUMMARY = {
     "aws3_robust_indicator": robust["encumbered_indicator_any_share"],
     "backtest_flat_median_abs_err": st.median(flat_err),
     "backtest_median_abs_err": st.median(errs), "backtest_agg_err": st.median(agg),
+    "zone_free_slope": SLOPE_ZF, "zone_free_uplift": zf_up_rev, "financing_now_wacc": w_now,
+    "financing_factor_a97": FACT["Auction 97 (AWS-3)"], "financing_observed_ratio": flat,
+    "midband_a107_usd_per_mhz_pop": p107, "midband_a110_usd_per_mhz_pop": p110,
     "qualcomm_pmp": qualcomm, "lease_pmp": lease, "a113_avg": a113_avg,
 }
 with open(OUT / "analysis_summary.csv", "w", newline="") as fh:

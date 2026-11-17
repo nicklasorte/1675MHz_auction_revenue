@@ -49,6 +49,20 @@ SHA-256 checksum lets you confirm that a fresh download matches the committed co
 `scripts/parse_geo.py` turns these into `data/processed/` tables. Two NTIA tables are typed into
 `parse_geo.py` from the report (site coordinates and distances; the Table 11 reference case).
 
+## Added in v0.6 (downloaded November 17, 2026)
+
+| File | What it is | Source | SHA-256 |
+| --- | --- | --- | --- |
+| `raw/fcc_auction107/a107_results_by_license.csv` | Auction 107 (3.7 GHz) results by license | [FCC PRS download](https://auctiondata.fcc.gov/public/projects/auction107/reports/results_by_license) | `83cc9c3da93fcd43246fa2d7aacb37a53a78be50e7e7b10e34f725bf73599777` |
+| `raw/fcc_auction107/a107_market.csv` | Auction 107 markets with population | [FCC PRS download](https://auctiondata.fcc.gov/public/projects/auction107/reports/market) | `a045fb0816dde3ac17ef050cb0d4452c8a49efe75ebe8b49ef816b91a6487767` |
+| `raw/fcc_auction110/a110_results_by_license.csv` | Auction 110 (3.45 GHz) results by license | [FCC PRS download](https://auctiondata.fcc.gov/public/projects/auction110/reports/results_by_license) | `66f873c5244b0cd781d94b8ea056ebe07b3138119d7cb441c15084a4b0986ad8` |
+| `raw/fred/DGS10.csv` | 10-year Treasury yield, daily (snapshot of November 13, 2026) | [FRED DGS10](https://fred.stlouisfed.org/series/DGS10) | `b9212adabc0b51a0e942c38a91dd4e61014d20c1ea83a26723e31024751b792d` |
+| `raw/fred/DBAA.csv` | Moody's Baa corporate yield, daily (snapshot of November 13, 2026) | [FRED DBAA](https://fred.stlouisfed.org/series/DBAA) | `f113063758c2139191f39307f8b8fc75a6fcec1ca16603eef855cd1c64dcdefc` |
+
+FRED can revise a series, so the snapshot in the repository is the record; a fresh download may differ. The
+financing analysis also uses typed-in inputs graded *assumed* in the working paper's Appendix A: debt share
+40%, equity beta 0.80, equity risk premium 5%, and the U.S. federal tax rate of 21%.
+
 ## Other inputs typed into the workbook
 
 These values sit on the workbook's `Inputs` and `Transactions` tabs, each with its source beside it:

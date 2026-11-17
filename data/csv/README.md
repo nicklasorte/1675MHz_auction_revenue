@@ -37,6 +37,13 @@ otherwise.
 | `monte_carlo_summary.csv` | Monte Carlo parameters and percentiles |
 | `monte_carlo_draws.csv` | All 10,000 draws (seed 1675): each bidder's value, the clearing price, who set it, and gross revenue |
 
+## Mid-band data (from `scripts/export_csvs.py`)
+
+| File | Contents |
+| --- | --- |
+| `a107_licenses.csv` | Every Auction 107 (3.7 GHz) license: market, block, bidder, gross and net bid, price per megahertz-pop |
+| `a110_licenses.csv` | Every Auction 110 (3.45 GHz) license, same columns |
+
 ## Phase B analyses (from `scripts/analysis.py`)
 
 | File | Contents |
@@ -45,7 +52,7 @@ otherwise.
 | `bidder_count_grid.csv` | Revenue for 0–6 D2D by 0–6 terrestrial bidders, point estimates and simulated percentiles |
 | `ntia_zone_validation.csv` | Zone model against NTIA Report 24-01 Table 11 (reference case) |
 | `zone_counties.csv` | Each county's distance to the nearest NOAA site and zone membership |
-| `zone_sweep.csv` | Revenue by zone radius, value kept inside zones, case, and license design |
+| `zone_sweep.csv` | Revenue by zone radius, value kept inside zones, case, license design, and market-size curve (zone-free or observed) |
 | `zone_pea_impact.csv` | The 25 PEAs with the most population inside zones at NTIA's distances |
 | `aws3_zone_calibration.csv` | Auction 97 B1 prices with the share of each market inside US88 protection zones |
 | `backtest.csv` | Split-half test of the market-size curve; Auction 113 out-of-sample checks |
@@ -55,3 +62,14 @@ otherwise.
 | `tornado.csv` | One-at-a-time sensitivity of the central estimate |
 | `fcc_ria_comparison.csv` | This estimate against the FCC's (FNPRM App. C) |
 | `analysis_summary.csv` | Headline statistics quoted in the working paper |
+| `zone_free_curve.csv` | Market-size elasticity and Auction 97 benchmark with the AWS-3 zone effect held out |
+| `zone_free_designs.csv` | License designs on the observed and zone-free curves (sensitivity) |
+| `stage_table.csv` | Price and revenue after each stage: central case in two stage orders, and the stressed case |
+| `financing_wacc.csv` | Cost of capital at each benchmark's date and today, from FRED yields and stated CAPM inputs |
+| `financing_test.csv` | Observed 2026-to-2015 price ratio, its bootstrap interval, and the ratio the financing adjustment predicts |
+| `financing_sensitivity.csv` | Scenario revenue with every benchmark repriced to today's financing |
+| `timing_sensitivity.csv` | Revenue if availability is delayed 0 to 3 years, by discount rate and scope |
+| `zone_structural.csv` | Value kept inside a zone: six assumed factors against the calibrated value |
+| `midband_reconciliation.csv` | Auctions 107 and 110 parsed and tied to published totals |
+| `midband_crosscheck.csv` | Mid-band-anchored cross-check, by stage |
+| `assumptions_register.csv` | Every input, value, basis, and evidence grade (paper Appendix A) |

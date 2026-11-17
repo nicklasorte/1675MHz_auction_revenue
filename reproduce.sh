@@ -15,6 +15,9 @@ echo "1. Extract Auction 97 tables from the FCC public notices"
 pdftotext -layout data/raw/fcc_auction97/DA-15-131A2.pdf "$INTERIM/a97_win.txt"
 pdftotext -layout data/raw/fcc_auction97/DA-14-1018A2.pdf "$INTERIM/a97_inv.txt"
 cp data/raw/fcc_auction113/a113_results_by_license.csv data/raw/fcc_auction113/a113_market.csv "$INTERIM/"
+cp data/raw/fcc_auction107/a107_results_by_license.csv data/raw/fcc_auction107/a107_market.csv "$INTERIM/"
+cp data/raw/fcc_auction110/a110_results_by_license.csv "$INTERIM/"
+cp data/raw/fcc_pea/a110_market.csv "$INTERIM/a110_market.csv"
 
 echo "2. Parse per-license results"
 python3 scripts/parse_auctions.py "$INTERIM" data/processed
@@ -40,3 +43,9 @@ python3 scripts/analysis.py data/processed data/raw/fcc_pea/a110_market.csv "$OU
 
 echo "8. Rebuild the working-paper figures from data/csv"
 python3 scripts/make_figures.py data/csv figures
+
+echo "9. Check the paper's dollar figures against data/csv"
+python3 scripts/check_paper.py data/csv docs/working-paper.md
+
+echo "10. Build the Word version of the paper (needs pandoc and python-docx)"
+if command -v pandoc >/dev/null 2>&1; then python3 scripts/make_docx.py; else echo "  pandoc not found; skipped"; fi

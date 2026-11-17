@@ -1,0 +1,6 @@
+measure,value,note
+observed_2026_to_2015_price_ratio,0.9880459297109987,"same licenses, price per person, nominal"
+observed_ratio_bootstrap_p2.5,0.8208242122904741,"2,000 resamples of the licenses sold in both auctions"
+observed_ratio_bootstrap_p97.5,1.718986252241149,
+ratio_predicted_by_financing_adjustment,0.86100324170792,15-year annuity factor at today's WACC / at Auction 97 WACC
+prediction_inside_bootstrap_interval,1,0 means the data reject a separate adjustment

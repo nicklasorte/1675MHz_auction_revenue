@@ -63,6 +63,22 @@ FILES = [
     ("ecfr/title47_section2.106_2026-11-01.xml",
      "https://www.ecfr.gov/api/versioner/v1/full/2026-11-01/title-47.xml?part=2&section=2.106",
      "660ecc8861147243c3fce116b5ab706976ef304f41c1ecc01497c864f6ceb33e"),
+    # v0.6 additions: mid-band cross-check (Auctions 107 and 110) and financing conditions (FRED).
+    # FRED files are snapshots taken November 13, 2026; FRED can revise a series, so the snapshot in the
+    # repository is the record and a fresh download may legitimately differ.
+    ("fcc_auction107/a107_results_by_license.csv",
+     "https://auctiondata.fcc.gov/public/projects/auction107/reports/results_by_license/download",
+     "83cc9c3da93fcd43246fa2d7aacb37a53a78be50e7e7b10e34f725bf73599777"),
+    ("fcc_auction107/a107_market.csv",
+     "https://auctiondata.fcc.gov/public/projects/auction107/reports/market/download",
+     "a045fb0816dde3ac17ef050cb0d4452c8a49efe75ebe8b49ef816b91a6487767"),
+    ("fcc_auction110/a110_results_by_license.csv",
+     "https://auctiondata.fcc.gov/public/projects/auction110/reports/results_by_license/download",
+     "66f873c5244b0cd781d94b8ea056ebe07b3138119d7cb441c15084a4b0986ad8"),
+    ("fred/DGS10.csv", "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
+     "b9212adabc0b51a0e942c38a91dd4e61014d20c1ea83a26723e31024751b792d"),
+    ("fred/DBAA.csv", "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DBAA",
+     "f113063758c2139191f39307f8b8fc75a6fcec1ca16603eef855cd1c64dcdefc"),
 ]
 
 

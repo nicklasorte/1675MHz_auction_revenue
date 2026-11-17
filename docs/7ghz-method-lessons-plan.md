@@ -9,6 +9,29 @@ band (report dated November 12, 2026) and lists what to adopt, what to test, and
 names no author and quotes none of that report's results, because this repository is public and the
 report's release status isn't confirmed. Comparison values can be added after clearance.
 
+## Status (November 17, 2026, v0.6)
+
+All ten items are done. Financing is a sensitivity only, as decided. Where results differ from the first-pass
+estimates in this plan, the paper and `data/csv/` hold the final numbers: the zone-free benchmark is about 10%
+higher (as estimated), the zone-free curve changes zone results by 1% or less, and the financing test can't
+separate the adjustment from none (interval 0.82 to 1.72 around an observed 0.99).
+
+| Item | Where it landed |
+|---|---|
+| 1. Zone double count | `zone_free_curve.csv`, `zone_free_designs.csv`, `zone_sweep.csv` (`size_curve` column); paper sections 4 and 6.2 |
+| 2. Stage table, bridge | `stage_table.csv`; paper section 5.7; Figure 12 |
+| 3. Financing test | `financing_wacc.csv`, `financing_test.csv`, `financing_sensitivity.csv`; paper section 7.1; tornado |
+| 4. Timing | `timing_sensitivity.csv`; paper section 7.2; Figure 13 |
+| 5. Structural zone check | `zone_structural.csv`; paper section 6.4 |
+| 6. Conditional wording | Paper opening, executive summary, Figures 4 and 5 |
+| 7. Outside the model | Paper section 8 |
+| 8. Mid-band cross-check | `midband_reconciliation.csv`, `midband_crosscheck.csv`; paper section 7.3; Figure 14 |
+| 9. Gross-revenue scope | Paper opening and limitations |
+| 10. Assumptions register | Paper Appendix A; `assumptions_register.csv` |
+
+Decision 1 (financing as sensitivity) is settled. Decisions 2 to 4 below were resolved as follows: delays of 0
+to 3 years; the report is cited generically; the mid-band cross-check ran after items 1 to 7.
+
 ## Bottom line
 
 - **Adopt:** a stage table that shows the price after each adjustment, an explicit financing-cost and

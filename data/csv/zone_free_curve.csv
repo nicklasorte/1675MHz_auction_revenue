@@ -1,0 +1,9 @@
+measure,value,note
+market_size_elasticity_observed,0.6497921502333874,"174 B1 licenses, log price on log population"
+market_size_elasticity_zone_free,0.6692395110757362,"172 markets, zone share held in the regression"
+zone_coefficient,-1.029447867859464,log price per unit share of population inside an AWS-3 zone
+average_value_kept_revenue_weighted,0.9094842971163976,observed B1 revenue / zone-free B1 revenue
+zone_free_uplift_factor,1.0995242063778239,"zone-free price / observed price, revenue weighted"
+population_share_inside_aws3_zones,0.08687179557980718,"B1 markets, 2010 population"
+terrestrial_uplink_base_observed_usd_per_mhz_pop,0.5219933610807408,Auction 97 unpaired average
+terrestrial_uplink_base_zone_free_usd_per_mhz_pop,0.5739443360767944,observed base x uplift factor (sensitivity only)

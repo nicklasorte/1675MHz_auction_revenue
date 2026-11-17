@@ -1,0 +1,6 @@
+anchor,stage,usd_per_mhz_pop,gross_20mhz_usd,change_usd
+Auction 107 anchor,"Anchor price (nominal, 2020 Census)",0.8804215193631418,5836301591.396818,
+Auction 107 anchor,Financing: reprice to today's cost of capital,0.7012898655021859,4648840433.865725,-1187461157.5310936
+Auction 107 anchor,Market perception: Auction 110 price relative to Auction 107,0.5596656326959835,3710015431.149876,-938825002.7158484
+Auction 110 anchor,"Anchor price (nominal, 2020 Census)",0.6837623606301974,4532650856.114833,
+Auction 110 anchor,Financing: reprice to today's cost of capital,0.5596656326959835,3710015431.149876,-822635424.9649568

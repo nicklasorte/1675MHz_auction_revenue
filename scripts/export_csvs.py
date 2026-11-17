@@ -43,6 +43,11 @@ def val(sheet, ref):
     return WB[sheet][ref].value
 
 
+# Auctions 107 and 110 (mid-band cross-check): every license, as parsed from the FCC downloads.
+for aid in (107, 110):
+    src_rows = list(csv.reader(open(PROC / f"a{aid}_licenses.csv")))
+    write(f"a{aid}_licenses.csv", src_rows[0], src_rows[1:])
+
 # ------------------------------------------------------------------ Inputs: FCC data, filtered
 resold = {"AW-" + x["license"] for x in A113}
 

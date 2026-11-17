@@ -1,0 +1,23 @@
+input,value,basis,evidence_grade,file
+Benchmark: terrestrial uplink base,0.5219933610807408,Auction 97 unpaired (A1+B1) average,observed,benchmarks.csv
+Benchmark: satellite uplink base,0.6145190908151648,"EchoStar sale price over 85% of population, 15-year term",observed,benchmarks.csv
+Benchmark: D2D downlink base,0.7758135916513186,Grain 800 MHz prior market value over 14 years,observed (press),benchmarks.csv
+Benchmark: terrestrial downlink base,0.4812659949641553,Average of 1670-1675 MHz lease and Qualcomm 700 MHz sale,observed (lease capitalized),benchmarks.csv
+"Nominal-flat price ratio, 2026 to 2015",0.9880459297109987,196 licenses sold in Auctions 97 and 113,observed,financing_test.csv
+National premium for D2D,1.213905147666591,Calibrated to the EchoStar price relative to holdings,calibrated,inputs.csv
+Market-size elasticity (observed curve),0.6497921502333874,174 B1 licenses,calibrated,zone_free_curve.csv
+Market-size elasticity (zone-free curve),0.6692395110757362,172 markets with zone share held in the regression,calibrated,zone_free_curve.csv
+Value kept inside a zone,0.35720413001325735,Auction 97 B1 prices on AWS-3 protection zones; 95% interval 22%-57%,calibrated,analysis_summary.csv
+"Zone distances (km): Fairmont, Sioux Falls, Suitland, Wallops","459, 346, 468, 446",NTIA Report 24-01 Table 9,observed,ntia_zone_validation.csv
+Carrier value spread (lognormal sigma),0.237763975890283,Auction 97 paired winners over $1 billion,calibrated,monte_carlo_summary.csv
+D2D value in simulation,uniform between EchoStar and Grain prior prices,Spread of D2D comparables,assumed,monte_carlo_summary.csv
+D2D bidders in base case,3,No named bidder list,assumed,bidder_count_grid.csv
+Terrestrial bidders in base case,4,No named bidder list,assumed,bidder_count_grid.csv
+Discount rate for capitalizing and for delay,0.07,FCC RIA rate (OMB Circular A-4),observed (FCC),income_check.csv
+License term (years),15,FNPRM para. 56,observed (FCC),income_check.csv
+CAPM debt share,0.4,Typical wireless capital structure; replace with a sourced figure,assumed,financing_wacc.csv
+CAPM equity beta,0.8,Typical regulated-telecom range 0.6-1.0,assumed,financing_wacc.csv
+CAPM equity risk premium,0.05,Common practitioner value,assumed,financing_wacc.csv
+Corporate tax rate,0.21,U.S. federal statutory rate,observed,financing_wacc.csv
+Structural zone factors (six),see file,Illustrative ranges; no public measurement,assumed,zone_structural.csv
+Availability delay (years),0 to 3,No public clearing schedule; sensitivity only,assumed,timing_sensitivity.csv

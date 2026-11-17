@@ -7,9 +7,12 @@ licenses, and PEA licenses with nationwide package bids, and models the coordina
 four NOAA Data Collection System receive sites, which constrain terrestrial base-station downlink only. The 2020–2025 MHz block in the same proposal is out of
 scope.
 
-Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (v0.5, 11 figures).
+Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (v0.6, 14 figures; also as
+[`docs/working-paper.docx`](docs/working-paper.docx)).
 
-## Results (v0.5, November 13, 2026)
+## Results (v0.6, November 17, 2026)
+
+Every range is conditional on stated assumptions; none is a confidence interval.
 
 | Measure | Gross bids |
 |---|---|
@@ -17,6 +20,9 @@ Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (
 | Simulated 10th to 90th percentile | $3.33B–$4.50B |
 | Two or fewer D2D bidders, or SCS leased instead of bid | $3.46B |
 | Terrestrial downlink sets the price (2 D2D): no zones / half / full NTIA distances | $3.19B / $2.99B / $2.38B |
+| Central estimate repriced to today's financing (sensitivity) | $3.88B |
+| Central estimate with 1 / 2 / 3 years of delay at 7% (sensitivity) | $3.81B / $3.56B / $3.33B |
+| Mid-band cross-check (Auction 107 / Auction 110 anchors, repriced) | $4.65B / $3.71B |
 | FCC's own estimate for the same 20 MHz (FNPRM App. C method) | $17.0B |
 
 | License design, no zones | Nationwide | PEA only | PEA + packages |
@@ -27,7 +33,7 @@ Start with the working paper, [`docs/working-paper.md`](docs/working-paper.md) (
 The FCC's estimate is higher mainly because it applies the Auction 113 average price, which is 98%
 paired spectrum; unpaired spectrum next door sold for one-fifth as much. PEA licenses with package
 bids match or beat the other designs in every case tested, including with zones, if at least three
-D2D bidders compete. The zones bind only when terrestrial downlink bidders set the price.
+D2D bidders compete. The zones reduce revenue only when terrestrial downlink bidders set the price.
 
 ## Documents
 
@@ -44,7 +50,7 @@ D2D bidders compete. The zones bind only when terrestrial downlink bidders set t
 ## Reproduce the analysis
 
 Requirements: Python 3.10 or later (`pip install -r requirements.txt`: openpyxl, matplotlib, numpy,
-pyshp), `pdftotext` (poppler-utils), and LibreOffice.
+pyshp, python-docx), `pdftotext` (poppler-utils), and LibreOffice.
 
 ```bash
 ./reproduce.sh
@@ -61,9 +67,12 @@ The script:
 4. Exports every dataset to `data/csv/` and ties it to the published FCC totals and the workbook
    (`scripts/export_csvs.py`, `scripts/check_csvs.py`).
 5. Runs the independent Python model and the analyses: bidder counts, NOAA zones, AWS-3 zone
-   calibration, backtest, stress tests, tornado, and the FCC comparison (`scripts/analysis.py`). It
-   stops if the Python model doesn't reproduce the workbook.
+   calibration and the zone-free curve, financing and timing sensitivities, structural zone check,
+   mid-band cross-check, stage table, backtest, stress tests, tornado, and the FCC comparison
+   (`scripts/analysis.py`). It stops if the Python model doesn't reproduce the workbook.
 6. Rebuilds all figures from `data/csv/` (`scripts/make_figures.py`); reruns write identical files.
+7. Checks the paper's dollar figures against `data/csv/` (`scripts/check_paper.py`) and builds the Word
+   version (`scripts/make_docx.py`; needs pandoc and python-docx).
 
 The run prints PASS, with one check PENDING until the remaining transaction terms are verified in
 primary filings.
@@ -73,7 +82,7 @@ primary filings.
 | Path | Contents |
 |---|---|
 | `reproduce.sh` | One-command rebuild |
-| `scripts/` | Download, parsers, workbook builder, recalculation, verification, export, analyses, figures |
+| `scripts/` | Download, parsers, workbook builder, recalculation, verification, export, analyses, figures, paper check, Word build |
 | `data/raw/` | Unedited source files (FCC, NTIA, Census Bureau, eCFR) |
 | `data/SOURCES.md` | Source URL and SHA-256 for every raw file, plus typed-in inputs |
 | `data/processed/` | Parsed tables |
@@ -90,4 +99,7 @@ primary filings.
   which NTIA calls conservative, and smaller fractions. The cost of a zone is calibrated on 19 AWS-3 markets.
 - Except the Qualcomm 700 MHz sale (FCC 11-188), transaction terms come from releases and press reports.
 - Bidders are modeled as counts by class, not named firms.
+- Financing, availability delay, and the structural zone factors are sensitivities with assumed inputs;
+  `docs/working-paper.md` Appendix A grades every input as observed, calibrated, or assumed.
+- The zone, financing, timing, and mid-band analyses run in the Python layer, not the workbook.
 - The decision memo is still the v0.4 copy and names bidders; it needs a refresh to match v0.5.

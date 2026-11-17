@@ -30,6 +30,13 @@ def check(label, got, want, tol=0.0):
 a113 = rd("a113_licenses.csv")
 check("A113 license count", len(a113), 200)
 
+# Auctions 107 and 110 tie to the published totals (about $81.17 billion and $22.5 billion gross).
+for aid, nlic, pub, tol in ((107, 5684, 81.17e9, 0.005e9), (110, 4041, 22.5e9, 0.05e9)):
+    rows_ = rd(f"a{aid}_licenses.csv")
+    check(f"A{aid} license count", len(rows_), nlic)
+    check(f"A{aid} PEA markets", len({r["market"] for r in rows_}), 406)
+    check(f"A{aid} gross bids against the published total", sum(float(r["gross_bid"]) for r in rows_), pub, tol)
+
 # Auction 97: unpaired + paired files together hold every license the model parses.
 a97u, a97p = rd("a97_unpaired_licenses.csv"), rd("a97_paired_licenses.csv")
 check("A97 license rows (unpaired + paired)", len(a97u) + len(a97p), 1614)

@@ -282,7 +282,7 @@ ax.autoscale_view()
 save(fig, "fig9_zone_map")
 
 # Figure 10: revenue by license design as zones grow ---------------------------------------------
-zs = rd("zone_sweep.csv")
+zs = [r for r in rd("zone_sweep.csv") if r["size_curve"] == "zone-free"]
 keep = sorted({r["value_retained_in_zone"] for r in zs})[1]  # calibrated value retained
 fig, axes = plt.subplots(1, 2, figsize=(6.5, 3.2), sharey=True)
 for ax, case in zip(axes, ("Terrestrial downlink, 3 D2D bidders", "Terrestrial downlink, 2 D2D bidders")):
@@ -344,3 +344,75 @@ ax.set_xlabel("Share of market population inside AWS-3 federal protection zones"
 ax.set_ylabel("Price relative to market-size\nexpectation (log scale)")
 ax.set_xlim(-0.03, 1.05)
 save(fig, "fig11_aws3_calibration")
+
+
+# Figure 12: bridge for the stressed case: zones, delay, financing -------------------------------------
+st_ = [r for r in rd("stage_table.csv") if r["case"] == "Stressed"]
+labs = ["Terrestrial downlink,\n2 D2D bidders,\nno zones", "NOAA zones at\nNTIA distances", "Availability delay,\n2 years at 7%",
+        "Financing repriced\n(sensitivity)", "Stressed case"]
+vals = [float(r["gross_usd_after"]) / B for r in st_]
+fig, ax = plt.subplots(figsize=(6.5, 3.4))
+ax.bar(0, vals[0], color=GRAY, width=0.62, zorder=2)
+ax.text(0, vals[0] + 0.07, f"${vals[0]:.2f}B", ha="center", color=DARK, fontweight="bold", fontsize=8.5)
+for i in range(1, 4):
+    lo_, hi_ = sorted((vals[i - 1], vals[i]))
+    ax.bar(i, hi_ - lo_, bottom=lo_, color="white", edgecolor=DARK, hatch="////", linewidth=0.9, width=0.62, zorder=2)
+    ax.text(i, hi_ + 0.07, f"−${vals[i - 1] - vals[i]:.2f}B", ha="center", color=DARK, fontsize=8.5)
+ax.bar(4, vals[3], color=BLUE, width=0.62, zorder=2)
+ax.text(4, vals[3] + 0.07, f"${vals[3]:.2f}B", ha="center", color=DARK, fontweight="bold", fontsize=8.5)
+ax.set_xticks(range(5), labs, fontsize=7.5)
+ax.set_ylabel("Gross bids, billions of dollars"); ax.set_ylim(0, 3.7)
+save(fig, "fig12_stressed_bridge")
+
+# Figure 13: availability delay -------------------------------------------------------------------------
+tm = rd("timing_sensitivity.csv")
+sel = lambda r_, sc, col: [float(x[col]) / B for x in tm if abs(float(x["discount_rate"]) - r_) < 1e-9 and x["scope"] == sc]
+fig, ax = plt.subplots(figsize=(6.5, 3.3))
+yrs = [0, 1, 2, 3]
+ax.fill_between(yrs, sel(0.09, "nationwide", "central_3_d2d_usd"), sel(0.05, "nationwide", "central_3_d2d_usd"),
+                color="#E8E9EA", lw=0, zorder=1)
+ax.plot(yrs, sel(0.07, "nationwide", "central_3_d2d_usd"), color=BLUE, lw=2.4, marker="o", ms=5, zorder=3)
+ax.plot(yrs, sel(0.07, "nationwide", "terrestrial_downlink_2_d2d_full_zones_usd"), color=DARK, lw=1.6, marker="o", ms=4, zorder=3)
+ax.plot(yrs, sel(0.07, "zone areas only", "terrestrial_downlink_2_d2d_full_zones_usd"), color=GRAY, lw=1.6, ls="--", marker="o", ms=4, zorder=3)
+ax.text(3.08, sel(0.07, "nationwide", "central_3_d2d_usd")[-1], "Central case, delay\neverywhere", color=BLUE, fontweight="bold", fontsize=8, va="center")
+ax.text(3.08, sel(0.07, "nationwide", "terrestrial_downlink_2_d2d_full_zones_usd")[-1] - 0.12, "Zone case (2 D2D),\ndelay everywhere", color=DARK, fontsize=8, va="center")
+ax.text(3.08, sel(0.07, "zone areas only", "terrestrial_downlink_2_d2d_full_zones_usd")[-1] + 0.18, "Zone case (2 D2D),\ndelay inside zones only", color=GRAY, fontsize=8, va="center")
+ax.text(0.05, 0.6, "Gray band around the central line: discount rates 5% to 9% (line: 7%)", color=DARK, fontsize=7.5)
+ax.set_xlim(-0.2, 4.6); ax.set_ylim(0, 4.6); ax.set_xticks(yrs)
+ax.set_xlabel("Years before the band is available"); ax.set_ylabel("Gross bids, billions of dollars")
+save(fig, "fig13_delay")
+
+# Figure 14: valuation football field ----------------------------------------------------------------------
+sc_ = {r["scenario"]: float(r["gross_revenue_usd"]) / B for r in rd("scenarios.csv")}
+mcs = np.sort(np.array([float(r["gross_revenue_usd"]) for r in rd("monte_carlo_draws.csv")])) / B
+pq = lambda q: mcs[int(q * (len(mcs) - 1))]
+bg = [r for r in rd("bidder_count_grid.csv") if r["terrestrial_bidders"] == "4"]
+bgm = [float(r["monte_carlo_median_usd"]) / B for r in bg]
+fcc20_ = float([r for r in rd("fcc_ria_comparison.csv") if r["estimate"] == "FCC RIA method, scaled to 20 MHz"][0]["gross_usd"]) / B
+mbk = [float(r["gross_20mhz_usd"]) / B for r in rd("midband_crosscheck.csv") if not r["stage"].startswith("Anchor")]
+tz = [float(r["central_3_d2d_usd"]) / B for r in tm if abs(float(r["discount_rate"]) - 0.07) < 1e-9 and r["scope"] == "nationwide"]
+fsn = rd("financing_sensitivity.csv")
+rows_ff = [
+    ("FCC method, 20 MHz (±50%)", 0.5 * fcc20_, 1.5 * fcc20_, fcc20_, GRAY),
+    ("Scenarios S1–S9 (low to high benchmarks)", sc_["S6 Low"], sc_["S7 High"], sc_["S1 Base"], GRAY),
+    ("Mid-band anchor (Auctions 107, 110)", min(mbk), max(mbk), None, GRAY),
+    ("Simulation, 10th–90th percentile", pq(0.1), pq(0.9), pq(0.5), BLUE),
+    ("0 to 6 D2D bidders (simulated median)", min(bgm), max(bgm), None, GRAY),
+    ("Availability delay, 0 to 3 years", min(tz), max(tz), None, GRAY),
+    ("Benchmarks repriced to today's financing", float(fsn[0]["repriced_to_today_usd"]) / B, float(fsn[0]["base_usd"]) / B, None, GRAY),
+    ("Zone case, 2 D2D (no zones to full zones)", float([r for r in rd("stage_table.csv") if r["case"] == "Stressed"][1]["gross_usd_after"]) / B,
+     float([r for r in rd("stage_table.csv") if r["case"] == "Stressed"][0]["gross_usd_after"]) / B, None, GRAY),
+]
+fig, ax = plt.subplots(figsize=(6.5, 3.7))
+for i, (lab, lo_, hi_, mid_, col) in enumerate(rows_ff):
+    y_ = len(rows_ff) - 1 - i
+    ax.barh(y_, hi_ - lo_, left=lo_, color=col, height=0.5, zorder=2)
+    if mid_ is not None:
+        ax.plot(mid_, y_, marker="|", ms=18, mew=2.4, color=DARK, zorder=4)
+    ax.text(lo_ - 0.2, y_, f"${lo_:.1f}B", ha="right", va="center", fontsize=7.5, color=DARK, bbox=dict(fc="white", ec="none", pad=0.6))
+    ax.text(hi_ + 0.2, y_, f"${hi_:.1f}B", ha="left", va="center", fontsize=7.5, color=DARK, bbox=dict(fc="white", ec="none", pad=0.6), zorder=5)
+ax.axvline(sc_["S1 Base"], color=DARK, lw=0.9, ls="--", zorder=1)
+ax.text(sc_["S1 Base"] + 0.15, len(rows_ff) - 0.35, f"Central ${sc_['S1 Base']:.2f}B", fontsize=8, color=DARK, fontweight="bold")
+ax.set_yticks(range(len(rows_ff)), [r[0] for r in reversed(rows_ff)], fontsize=7.5)
+ax.set_xlim(0, 29); ax.set_xlabel("Gross bids for 20 megahertz, billions of dollars"); style_h(ax)
+save(fig, "fig14_football_field")

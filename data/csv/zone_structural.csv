@@ -1,0 +1,9 @@
+factor,low,central,high,evidence_grade
+Share of the band usable inside a zone,0.7,0.85,1.0,assumed
+Share of sites approved after coordination,0.6,0.8,0.95,assumed
+"Technical performance retained (power, antenna limits)",0.7,0.8,0.95,assumed
+Timing discount for coordination,0.85,0.92,1.0,assumed
+Certainty of rules and process,0.8,0.9,1.0,assumed
+Reuse of existing sites,0.9,0.95,1.0,assumed
+Product of factors,0.179928,0.4279104,0.9025,assumed
+Calibrated on Auction 97 (95% interval),0.2238022602862272,0.35720413001325735,0.5701228858696216,calibrated

@@ -1,0 +1,19 @@
+case,stage_order,stage_number,stage,usd_per_mhz_pop_after,gross_usd_after,change_usd
+Central,population first,0,"FCC method, 20 MHz",2.53,16954702705.599998,0.0
+Central,population first,1,2020 Census population,2.53,16771333618.599998,-183369087.0
+Central,population first,2,Unpaired price (Auction 97 A1+B1 average),0.5219933610807408,3460286484.339699,-13311047134.2603
+Central,population first,3,"Auction rule: 3 D2D bidders, third-highest bid",0.6145190908151645,4073638216.2292,613351731.8895011
+Central,population first,4,NOAA zones (terrestrial downlink only),0.6145190908151645,4073638216.2292,0.0
+Central,population first,5,Availability delay (0 years),0.6145190908151645,4073638216.2292,0.0
+Central,population first,6,Financing (sensitivity only; not applied),0.6145190908151645,4073638216.2292,0.0
+Central,price first,0,"FCC method, 20 MHz",2.53,16954702705.599998,0.0
+Central,price first,1,Unpaired price (Auction 97 A1+B1 average),0.5219933610807408,3498119466.964772,-13456583238.635227
+Central,price first,2,2020 Census population,0.5219933610807408,3460286484.339699,-37832982.62507343
+Central,price first,3,"Auction rule: 3 D2D bidders, third-highest bid",0.6145190908151645,4073638216.2292,613351731.8895011
+Central,price first,4,NOAA zones (terrestrial downlink only),0.6145190908151645,4073638216.2292,0.0
+Central,price first,5,Availability delay (0 years),0.6145190908151645,4073638216.2292,0.0
+Central,price first,6,Financing (sensitivity only; not applied),0.6145190908151645,4073638216.2292,0.0
+Stressed,"zones, delay, financing",0,"Terrestrial downlink, 2 D2D, no zones",0.48126599496415523,3190305360.0123773,0.0
+Stressed,"zones, delay, financing",1,NOAA zones at NTIA distances,0.3583444821181142,2375460418.967326,-814844941.0450511
+Stressed,"zones, delay, financing",2,"Availability delay, 2 years at 7%",0.3129919487449683,2074819127.4061718,-300641291.56115437
+Stressed,"zones, delay, financing",3,Financing repricing (sensitivity),0.29391471047621637,1948356389.2533016,-126462738.15287018
