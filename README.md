@@ -37,6 +37,7 @@ D2D bidders compete. The zones bind only when terrestrial downlink bidders set t
 | [`docs/dataviz-plan.md`](docs/dataviz-plan.md) | Ten ways to show the results, and which are built |
 | [`docs/literature-review.md`](docs/literature-review.md) | Related work on valuation, auctions, sharing, and SCS |
 | [`docs/next-phase-plan.md`](docs/next-phase-plan.md) | The plan this version carries out, with status |
+| [`docs/7ghz-method-lessons-plan.md`](docs/7ghz-method-lessons-plan.md) | Plan to apply lessons from the 7 GHz auction-value report |
 | [`docs/license-design-memo.md`](docs/license-design-memo.md) | One-page decision memo (v0.4 copy) |
 | [`docs/1675-auction-valuation-plan.md`](docs/1675-auction-valuation-plan.md), [`docs/1675-auction-redteam.md`](docs/1675-auction-redteam.md) | Original plan and red-team review |
 
